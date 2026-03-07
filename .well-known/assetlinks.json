@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.cryptidcolouring.twa",
+        "sha256_cert_fingerprints": ["C6:AF:F1:C7:3B:15:D4:B8:8A:74:3F:61:82:3A:47:28:12:F3:C9:88:20:8D:FC:00:83:F0:DE:2F:F1:C4:A5:3D"]
+      }
+    }]
