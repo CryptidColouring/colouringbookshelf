@@ -1,17 +1,38 @@
 {
   "name": "Colouring Bookshelf",
   "short_name": "ColourShelf",
-  "description": "Track your colouring book collection",
+  "description": "Track your colouring book collection — sort by author, tag, and pages coloured. Works fully offline.",
+  "id": "/colouring-bookshelf/",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#D0EBCD",
   "theme_color": "#4D9166",
   "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["lifestyle", "utilities", "books"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%234D9166'/><text x='50%' y='55%' font-size='110' text-anchor='middle' dominant-baseline='middle'>🎨</text></svg>",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "label": "Colouring Bookshelf app"
     }
   ]
 }
