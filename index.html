@@ -157,6 +157,61 @@
   .book-card-pages { font-size: 11px; color: var(--gold); font-weight: 700; margin-left: auto; }
   .book-card-tags { font-size: 11px; color: var(--ink-soft); margin-top: 5px; }
 
+  /* Cover photo */
+  .book-card-inner { display: flex; gap: 12px; align-items: flex-start; }
+  .book-cover {
+    width: 56px; height: 56px; border-radius: 6px;
+    object-fit: cover; flex-shrink: 0;
+    background: var(--cream-dark);
+    border: 1.5px solid var(--parchment);
+  }
+  .book-cover-placeholder {
+    width: 56px; height: 56px; border-radius: 6px; flex-shrink: 0;
+    background: var(--cream-dark); border: 1.5px dashed var(--parchment);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; cursor: pointer;
+  }
+  .book-card-body { flex: 1; min-width: 0; }
+
+  /* Completion bar on card */
+  .completion-bar-wrap {
+    background: var(--cream-dark); border-radius: 4px; height: 6px;
+    overflow: hidden; margin-top: 7px;
+  }
+  .completion-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--terracotta-light), var(--terracotta));
+    transition: width 0.4s ease;
+  }
+  .completion-label { font-size: 11px; color: var(--terracotta); font-weight: 700; margin-top: 3px; }
+
+  /* Photo upload in form */
+  .photo-upload-area {
+    width: 100%; aspect-ratio: 1/1; max-width: 140px;
+    border-radius: var(--radius-sm); border: 2px dashed var(--parchment);
+    background: var(--cream); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; position: relative; overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .photo-upload-area:hover { border-color: var(--terracotta); }
+  .photo-upload-area img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .photo-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .photo-upload-label { font-size: 11px; color: var(--ink-soft); font-weight: 600; text-align: center; pointer-events: none; }
+  .photo-upload-icon { font-size: 28px; pointer-events: none; }
+  .photo-remove {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(0,0,0,0.55); color: white;
+    border: none; border-radius: 50%; width: 22px; height: 22px;
+    font-size: 13px; cursor: pointer; display: none;
+    align-items: center; justify-content: center; z-index: 2;
+  }
+  .photo-remove.visible { display: flex; }
+
+  /* Pages row side by side */
+  .pages-row { display: flex; gap: 12px; }
+  .pages-row .form-group { flex: 1; margin-bottom: 0; }
+
   .empty-state {
     text-align: center; padding: 48px 24px;
     color: var(--ink-soft);
@@ -367,14 +422,15 @@
   .header-gear {
     margin-left: auto;
     background: rgba(255,255,255,0.18);
-    border: none; border-radius: 50%;
-    width: 38px; height: 38px;
-    display: flex; align-items: center; justify-content: center;
+    border: none; border-radius: 12px;
+    padding: 5px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
     font-size: 20px; cursor: pointer;
     transition: background 0.15s;
     flex-shrink: 0;
   }
   .header-gear:active { background: rgba(255,255,255,0.32); }
+  .header-gear-label { font-size: 10px; font-weight: 700; opacity: 0.9; font-family: 'Nunito', sans-serif; }
 
   /* ── Theme presets grid ── */
   .theme-grid {
@@ -433,7 +489,9 @@
       <h1>Colouring Bookshelf</h1>
       <div class="header-sub" id="header-sub">Loading…</div>
     </div>
-    <button class="header-gear" onclick="openSettings()" title="Colour Settings">🎨</button>
+    <button class="header-gear" onclick="openSettings()" title="Colour Settings">
+      🎨<span class="header-gear-label">Change Theme</span>
+    </button>
   </header>
 
   <!-- Main content -->
@@ -466,6 +524,16 @@
           <div class="edit-title" id="form-title">Add New Book</div>
         </div>
         <div class="form-group">
+          <label class="form-label">Cover Photo</label>
+          <div class="photo-upload-area" id="photo-upload-area" onclick="triggerPhotoInput()">
+            <img id="photo-preview" style="display:none">
+            <span class="photo-upload-icon" id="photo-icon">📷</span>
+            <span class="photo-upload-label" id="photo-hint">Tap to add cover</span>
+            <input type="file" id="f-photo" accept="image/*" onchange="handlePhoto(event)">
+            <button class="photo-remove" id="photo-remove" onclick="removePhoto(event)">✕</button>
+          </div>
+        </div>
+        <div class="form-group">
           <label class="form-label">Book Title *</label>
           <input class="form-input" id="f-title" placeholder="e.g. Enchanted Forest" autocomplete="off">
         </div>
@@ -479,8 +547,17 @@
           <input class="form-input" id="f-tags" placeholder="e.g. nature, fantasy, detailed" autocomplete="off">
         </div>
         <div class="form-group">
-          <label class="form-label">Pages Coloured</label>
-          <input class="form-input" id="f-pages" type="number" min="0" placeholder="0" style="max-width:140px">
+          <label class="form-label">Pages</label>
+          <div class="pages-row">
+            <div class="form-group">
+              <label class="form-label" style="font-size:11px">Coloured so far</label>
+              <input class="form-input" id="f-pages" type="number" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:11px">Total in book</label>
+              <input class="form-input" id="f-total-pages" type="number" min="0" placeholder="0">
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Format & Progress</label>
@@ -586,28 +663,136 @@
     </div>
 
     <div class="divider"></div>
+    <div class="settings-section-title">💾 Your Data</div>
+    <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">
+      Your books are stored on this device. Export a backup regularly — if you reinstall the app, use Import to restore everything including photos.
+    </p>
+    <button class="btn btn-primary" style="margin-bottom:10px" onclick="exportData()">📦 Export Backup</button>
+    <button class="btn btn-secondary" onclick="triggerImport()">📂 Import Backup</button>
+
+    <div class="divider"></div>
     <button class="btn btn-secondary" onclick="closeSettings()">Done</button>
   </div>
 </div>
+
+<!-- Hidden import file input -->
+<input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImport(event)">
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
 // ── Data ──────────────────────────────────────────────────────
-const STORAGE_KEY = 'colour_bookshelf_v1';
 let books = [];
 let editingId = null;
 let currentSort = 'title';
 let activeFilters = new Set();
 let toggleState = { physical: false, digital: false, used: false };
+let currentPhoto = null; // base64 string or null
 
-function load() {
-  try { books = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { books = []; }
+// ── Photo handling ────────────────────────────────────────────
+function triggerPhotoInput() {
+  document.getElementById('f-photo').click();
 }
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+
+function handlePhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      // Compress to 300x300 canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 300; canvas.height = 300;
+      const ctx = canvas.getContext('2d');
+      // Cover crop
+      const ratio = Math.max(300 / img.width, 300 / img.height);
+      const w = img.width * ratio, h = img.height * ratio;
+      ctx.drawImage(img, (300 - w) / 2, (300 - h) / 2, w, h);
+      currentPhoto = canvas.toDataURL('image/jpeg', 0.7);
+      showPhotoPreview(currentPhoto);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
 }
+
+function showPhotoPreview(src) {
+  const preview = document.getElementById('photo-preview');
+  preview.src = src; preview.style.display = 'block';
+  document.getElementById('photo-icon').style.display = 'none';
+  document.getElementById('photo-hint').style.display = 'none';
+  document.getElementById('photo-remove').classList.add('visible');
+}
+
+function removePhoto(e) {
+  e.stopPropagation();
+  currentPhoto = null;
+  const preview = document.getElementById('photo-preview');
+  preview.src = ''; preview.style.display = 'none';
+  document.getElementById('photo-icon').style.display = '';
+  document.getElementById('photo-hint').style.display = '';
+  document.getElementById('photo-remove').classList.remove('visible');
+  document.getElementById('f-photo').value = '';
+}
+
+// ── IndexedDB Storage ─────────────────────────────────────────
+const DB_NAME    = 'colour_bookshelf_db';
+const DB_VERSION = 1;
+const STORE      = 'books';
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        d.createObjectStore(STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function dbGetAll() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function dbPut(book) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).put(book);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function dbDelete(id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function dbClear() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).clear();
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 // ── Navigation ────────────────────────────────────────────────
@@ -672,11 +857,32 @@ function renderLibrary() {
       : `<span class="badge badge-unused">⏳ Not started</span>`);
     const tags = b.tags ? `<div class="book-card-tags">🏷 ${b.tags}</div>` : '';
     const pages = b.pages > 0 ? `<span class="book-card-pages">🖍 ${b.pages} pages</span>` : '';
+
+    // Completion bar
+    let completionHtml = '';
+    if (b.totalPages > 0) {
+      const pct = Math.min(100, Math.round((b.pages || 0) / b.totalPages * 100));
+      completionHtml = `
+        <div class="completion-bar-wrap"><div class="completion-bar-fill" style="width:${pct}%"></div></div>
+        <div class="completion-label">${pct}% complete (${b.pages||0} / ${b.totalPages} pages)</div>`;
+    }
+
+    // Cover photo or placeholder
+    const coverHtml = b.photo
+      ? `<img class="book-cover" src="${b.photo}" alt="cover">`
+      : `<div class="book-cover-placeholder" onclick="event.stopPropagation();quickAddPhoto('${b.id}')">📷</div>`;
+
     return `<div class="book-card${b.used ? ' used' : ''}" onclick="openBook('${b.id}')">
-      <div class="book-card-title">${esc(b.title)}</div>
-      <div class="book-card-author">${b.author ? '✍️ ' + esc(b.author) : '<i>No author</i>'}</div>
-      <div class="book-card-meta">${badges.join('')}${pages}</div>
-      ${tags}
+      <div class="book-card-inner">
+        ${coverHtml}
+        <div class="book-card-body">
+          <div class="book-card-title">${esc(b.title)}</div>
+          <div class="book-card-author">${b.author ? '✍️ ' + esc(b.author) : '<i>No author</i>'}</div>
+          <div class="book-card-meta">${badges.join('')}${pages}</div>
+          ${tags}
+          ${completionHtml}
+        </div>
+      </div>
     </div>`;
   }).join('');
 }
@@ -715,12 +921,36 @@ function openBook(id) {
   if (b.digital)  badges.push('<span class="badge badge-digital">💻 Digital</span>');
   const pages = b.pages > 0 ? `<p style="color:var(--gold);font-weight:700;font-size:15px;margin:8px 0">🖍 ${b.pages} pages coloured</p>` : '';
   const tags = b.tags ? `<p style="font-size:13px;color:var(--ink-soft);margin:6px 0">🏷 ${esc(b.tags)}</p>` : '';
+
+  // Completion
+  let completionHtml = '';
+  if (b.totalPages > 0) {
+    const pct = Math.min(100, Math.round((b.pages || 0) / b.totalPages * 100));
+    completionHtml = `
+      <div style="margin:10px 0 4px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:700;color:var(--ink-mid)">Completion</span>
+        <span style="font-size:13px;font-weight:700;color:var(--terracotta)">${pct}%</span>
+      </div>
+      <div class="completion-bar-wrap" style="height:8px"><div class="completion-bar-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-top:3px">${b.pages||0} of ${b.totalPages} pages</div>`;
+  }
+
+  // Cover photo
+  const photoHtml = b.photo
+    ? `<img src="${b.photo}" style="width:80px;height:80px;border-radius:8px;object-fit:cover;border:2px solid var(--parchment);flex-shrink:0">`
+    : '';
+
   document.getElementById('sheet-content').innerHTML = `
-    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:10px">${b.author ? '✍️ ' + esc(b.author) : ''}</p>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${badges.join('')}
-      ${b.used ? '<span class="badge badge-used">✅ Used</span>' : '<span class="badge badge-unused">⏳ Not started</span>'}
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px">
+      ${photoHtml}
+      <div>
+        <p style="color:var(--ink-soft);font-size:14px;margin-bottom:8px">${b.author ? '✍️ ' + esc(b.author) : ''}</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${badges.join('')}
+          ${b.used ? '<span class="badge badge-used">✅ Used</span>' : '<span class="badge badge-unused">⏳ Not started</span>'}
+        </div>
+      </div>
     </div>
-    ${pages}${tags}
+    ${pages}${tags}${completionHtml}
     <div style="display:flex;gap:10px;margin-top:20px">
       <button class="btn btn-primary" style="flex:1" onclick="editBook('${b.id}')">✏️ Edit</button>
       <button class="btn btn-secondary" style="flex:1" onclick="quickToggleUsed('${b.id}')">
@@ -730,12 +960,19 @@ function openBook(id) {
   document.getElementById('overlay').classList.add('open');
 }
 
-function quickToggleUsed(id) {
+async function quickToggleUsed(id) {
   const b = books.find(x => x.id === id);
   if (!b) return;
   b.used = !b.used;
-  save(); closeOverlay(); renderLibrary(); updateHeader();
+  await dbPut(b);
+  closeOverlay(); renderLibrary(); updateHeader();
   showToast(b.used ? '✅ Marked as used!' : '↩️ Marked as unused');
+}
+
+function quickAddPhoto(id) {
+  // Shortcut: open edit form directly on the photo field
+  editBook(id);
+  setTimeout(() => triggerPhotoInput(), 300);
 }
 
 function closeOverlay(e) {
@@ -766,10 +1003,15 @@ function editBook(id) {
   document.getElementById('f-author').value = b.author || '';
   document.getElementById('f-tags').value = b.tags || '';
   document.getElementById('f-pages').value = b.pages || '';
+  document.getElementById('f-total-pages').value = b.totalPages || '';
   toggleState.physical = !!b.physical;
   toggleState.digital  = !!b.digital;
   toggleState.used     = !!b.used;
   updateToggles();
+  // Load photo if exists
+  currentPhoto = b.photo || null;
+  if (currentPhoto) { showPhotoPreview(currentPhoto); }
+  else { removePhoto({ stopPropagation: () => {} }); }
   document.getElementById('delete-btn').style.display = 'block';
   document.getElementById('save-btn').textContent = '💾 Update Book';
   updateAuthorList();
@@ -781,8 +1023,16 @@ function resetForm() {
   document.getElementById('f-author').value = '';
   document.getElementById('f-tags').value = '';
   document.getElementById('f-pages').value = '';
+  document.getElementById('f-total-pages').value = '';
   toggleState = { physical: false, digital: false, used: false };
   updateToggles();
+  currentPhoto = null;
+  const preview = document.getElementById('photo-preview');
+  preview.src = ''; preview.style.display = 'none';
+  document.getElementById('photo-icon').style.display = '';
+  document.getElementById('photo-hint').style.display = '';
+  document.getElementById('photo-remove').classList.remove('visible');
+  document.getElementById('f-photo').value = '';
 }
 
 function toggleField(key) {
@@ -795,7 +1045,7 @@ function updateToggles() {
   document.getElementById('t-used').classList.toggle('on', toggleState.used);
 }
 
-function saveBook() {
+async function saveBook() {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { showToast('⚠️ Please enter a title'); return; }
   const book = {
@@ -804,9 +1054,11 @@ function saveBook() {
     author: document.getElementById('f-author').value.trim(),
     tags:   document.getElementById('f-tags').value.trim(),
     pages:  parseInt(document.getElementById('f-pages').value) || 0,
+    totalPages: parseInt(document.getElementById('f-total-pages').value) || 0,
     physical: toggleState.physical,
     digital:  toggleState.digital,
     used:     toggleState.used,
+    photo:    currentPhoto || null,
   };
   if (editingId) {
     const idx = books.findIndex(b => b.id === editingId);
@@ -816,15 +1068,17 @@ function saveBook() {
     books.push(book);
     showToast('✅ Book added!');
   }
-  save(); resetForm(); editingId = null;
+  await dbPut(book);
+  resetForm(); editingId = null;
   showView('library');
 }
 
-function deleteBook() {
+async function deleteBook() {
   if (!editingId) return;
   if (!confirm('Delete this book?')) return;
+  await dbDelete(editingId);
   books = books.filter(b => b.id !== editingId);
-  save(); editingId = null; resetForm();
+  editingId = null; resetForm();
   showToast('🗑 Book deleted');
   showView('library');
 }
@@ -1153,11 +1407,85 @@ function closeSettings(e) {
   }
 }
 
+// ── Export / Import ───────────────────────────────────────────
+function exportData() {
+  const payload = {
+    version: 1,
+    exportDate: new Date().toISOString(),
+    books: books,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `colouring-bookshelf-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📦 Backup saved!');
+}
+
+function triggerImport() {
+  document.getElementById('import-file-input').click();
+}
+
+async function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    const imported = payload.books || payload; // support both formats
+    if (!Array.isArray(imported)) throw new Error('Invalid format');
+
+    const existing = books.length;
+    const msg = existing > 0
+      ? `This will add ${imported.length} book(s) to your existing ${existing}. Continue?`
+      : `Import ${imported.length} book(s)?`;
+    if (!confirm(msg)) return;
+
+    // Merge — skip duplicates by id
+    const existingIds = new Set(books.map(b => b.id));
+    let added = 0;
+    for (const book of imported) {
+      if (!book.id || !book.title) continue;
+      if (!existingIds.has(book.id)) {
+        books.push(book);
+        await dbPut(book);
+        added++;
+      }
+    }
+    renderLibrary(); updateHeader();
+    showToast(`✅ Imported ${added} book${added !== 1 ? 's' : ''}!`);
+  } catch {
+    showToast('❌ Could not read that file');
+  }
+  e.target.value = '';
+}
+
 // ── Init ──────────────────────────────────────────────────────
-load();
-loadTheme();
-renderLibrary();
-updateHeader();
+(async () => {
+  // Migrate any existing localStorage data into IndexedDB
+  const STORAGE_KEY = 'colour_bookshelf_v1';
+  await openDB();
+  books = await dbGetAll();
+
+  // One-time migration from old localStorage if IDB is empty
+  if (books.length === 0) {
+    try {
+      const old = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (Array.isArray(old) && old.length > 0) {
+        for (const book of old) await dbPut(book);
+        books = old;
+        localStorage.removeItem(STORAGE_KEY);
+        showToast('✅ Data migrated to device storage!');
+      }
+    } catch {}
+  }
+
+  loadTheme();
+  renderLibrary();
+  updateHeader();
+})();
 </script>
 </body>
 </html>
