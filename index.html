@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#4D9166">
-<title>Colouring Bookshelf</title>
+<title>Colour Shelf</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -478,6 +478,184 @@
     display: flex; align-items: center; gap: 6px;
   }
   .divider { height: 1px; background: var(--cream-dark); margin: 20px 0; }
+
+  /* ── Shelf sections ── */
+  .shelf-section { margin-top: 20px; }
+  .shelf-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    cursor: pointer; margin-bottom: 8px;
+    user-select: none;
+  }
+  .shelf-header-honour { background: linear-gradient(135deg, #FFF8E1, #FFF3CC); border: 1.5px solid #F0C040; }
+  .shelf-header-naughty { background: linear-gradient(135deg, #FDE8E8, #FCCFCF); border: 1.5px solid #E08080; }
+  .shelf-header-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
+  .shelf-header-honour .shelf-header-title { color: #8B6914; }
+  .shelf-header-naughty .shelf-header-title { color: #8B2020; }
+  .shelf-chevron { font-size: 12px; transition: transform 0.2s; }
+  .shelf-chevron.open { transform: rotate(180deg); }
+  .shelf-body { display: none; }
+  .shelf-body.open { display: block; }
+
+  /* ── Share / Compare ── */
+  .share-row {
+    display: flex; gap: 8px; margin-bottom: 14px;
+  }
+  .share-btn {
+    flex: 1; padding: 8px 6px; border: none; border-radius: var(--radius-sm);
+    background: var(--cream-dark); color: var(--ink-mid);
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .share-btn:active { background: var(--parchment); }
+
+  /* ── Compare results ── */
+  .compare-section { margin-top: 16px; }
+  .compare-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 12px;
+    font-size: 11px; font-weight: 700; margin-left: 6px;
+  }
+  .compare-match { background: #D8EDDA; color: #2E6E46; }
+  .compare-unique { background: var(--cream-dark); color: var(--ink-soft); }
+
+  /* ── Calendar ── */
+  .cal-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .cal-nav-btn {
+    background: var(--cream-dark); border: none; border-radius: 50%;
+    width: 36px; height: 36px; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .cal-nav-btn:active { background: var(--parchment); }
+  .cal-month-label {
+    font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;
+    color: var(--ink);
+  }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 3px; margin-bottom: 16px;
+  }
+  .cal-day-name {
+    text-align: center; font-size: 11px; font-weight: 700;
+    color: var(--ink-soft); padding: 4px 0;
+  }
+  .cal-day {
+    aspect-ratio: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 8px; cursor: pointer; position: relative;
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    transition: background 0.12s;
+  }
+  .cal-day:active { background: var(--cream-dark); }
+  .cal-day.other-month { color: var(--parchment); }
+  .cal-day.today { background: var(--cream-dark); font-weight: 800; }
+  .cal-day.has-event::after {
+    content: ''; position: absolute; bottom: 3px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--terracotta);
+  }
+  .cal-day.selected { background: var(--terracotta); color: white; }
+  .cal-day.selected::after { background: white; }
+
+  .cal-events-title {
+    font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
+    margin-bottom: 10px; color: var(--ink);
+  }
+  .cal-event-card {
+    background: var(--white); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px;
+    box-shadow: 0 2px 6px var(--shadow);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-left: 3px solid var(--terracotta);
+  }
+  .cal-event-name { font-weight: 700; font-size: 14px; color: var(--ink); }
+  .cal-event-notes { font-size: 12px; color: var(--ink-soft); margin-top: 3px; }
+  .cal-event-delete {
+    background: none; border: none; font-size: 16px; cursor: pointer;
+    color: var(--ink-soft); padding: 2px 4px; flex-shrink: 0;
+  }
+  .cal-add-btn {
+    width: 100%; padding: 12px; border: 2px dashed var(--parchment);
+    border-radius: var(--radius-sm); background: none;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--ink-soft); cursor: pointer; margin-top: 4px;
+    transition: all 0.15s;
+  }
+  .cal-add-btn:active { border-color: var(--terracotta); color: var(--terracotta); }
+  .upcoming-event {
+    background: var(--white); border-radius: var(--radius-sm);
+    padding: 10px 14px; margin-bottom: 8px;
+    box-shadow: 0 2px 6px var(--shadow);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .upcoming-date {
+    text-align: center; min-width: 40px;
+    background: var(--terracotta); color: white;
+    border-radius: 8px; padding: 4px 6px;
+  }
+  .upcoming-day-num { font-size: 16px; font-weight: 800; line-height: 1; }
+  .upcoming-month { font-size: 9px; font-weight: 700; text-transform: uppercase; }
+  .upcoming-name { font-weight: 700; font-size: 13px; color: var(--ink); }
+  .upcoming-notes { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  /* ── 5-item nav ── */
+  .nav-btn { font-size: 10px; }
+
+  /* ── Help button ── */
+  .header-help {
+    background: rgba(255,255,255,0.18);
+    border: none; border-radius: 12px;
+    padding: 5px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 20px; cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .header-help:active { background: rgba(255,255,255,0.32); }
+  .header-help-label { font-size: 10px; font-weight: 700; opacity: 0.9; font-family: 'Nunito', sans-serif; }
+
+  /* ── Help content ── */
+  .help-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 18px 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .help-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--ink); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .help-section p {
+    font-size: 13px; color: var(--ink-soft);
+    line-height: 1.65; margin-bottom: 8px;
+  }
+  .help-section p:last-child { margin-bottom: 0; }
+  .help-section strong { color: var(--ink-mid); }
+  .help-disclaimer {
+    background: var(--cream-dark);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    font-size: 12px; color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .help-beta {
+    background: linear-gradient(135deg, var(--terracotta-light), var(--terracotta));
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    color: white;
+    text-align: center;
+  }
+  .help-beta-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .help-beta p { font-size: 13px; opacity: 0.93; line-height: 1.6; margin-bottom: 0; color: white; }
+  .help-beta a { color: white; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -486,9 +664,12 @@
   <header class="header">
     <div class="header-emoji">🎨</div>
     <div>
-      <h1>Colouring Bookshelf</h1>
+      <h1>Colour Shelf</h1>
       <div class="header-sub" id="header-sub">Loading…</div>
     </div>
+    <button class="header-help" onclick="showView('help')" title="Help & Guide">
+      ❓<span class="header-help-label">Help</span>
+    </button>
     <button class="header-gear" onclick="openSettings()" title="Colour Settings">
       🎨<span class="header-gear-label">Change Theme</span>
     </button>
@@ -499,6 +680,11 @@
 
     <!-- ── LIBRARY VIEW ── -->
     <div class="view active" id="view-library">
+      <div class="share-row">
+        <button class="share-btn" onclick="shareAsText()">📤 Share List</button>
+        <button class="share-btn" onclick="shareAsFile()">📦 Share File</button>
+        <button class="share-btn" onclick="openCompare()">🔀 Compare Lists</button>
+      </div>
       <div class="sort-bar">
         <span class="sort-label">Sort:</span>
         <button class="sort-pill active" data-sort="title">Title</button>
@@ -511,9 +697,41 @@
         <button class="filter-pill" data-filter="digital">💻 Digital</button>
         <button class="filter-pill" data-filter="used">✅ Used</button>
         <button class="filter-pill" data-filter="unused">⏳ Unused</button>
+        <button class="filter-pill" data-filter="hidecomplete">🙈 Hide Complete</button>
       </div>
       <div class="book-count" id="book-count"></div>
       <div id="book-list"></div>
+
+      <!-- Honour Shelf -->
+      <div class="shelf-section" id="honour-section" style="display:none">
+        <div class="shelf-header shelf-header-honour" onclick="toggleShelf('honour')">
+          <span class="shelf-header-title">🏆 Honour Shelf</span>
+          <span class="shelf-chevron" id="chevron-honour">▼</span>
+        </div>
+        <div class="shelf-body" id="shelf-body-honour"></div>
+      </div>
+
+      <!-- Naughty Shelf -->
+      <div class="shelf-section" id="naughty-section" style="display:none">
+        <div class="shelf-header shelf-header-naughty" onclick="toggleShelf('naughty')">
+          <span class="shelf-header-title">😈 Naughty Shelf</span>
+          <span class="shelf-chevron" id="chevron-naughty">▼</span>
+        </div>
+        <div class="shelf-body" id="shelf-body-naughty"></div>
+      </div>
+
+      <!-- Compare panel -->
+      <div class="compare-section" id="compare-section" style="display:none">
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="section-title" style="margin-bottom:0">🔀 Compare Lists</div>
+          <button onclick="openCompare()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);padding:4px">✕</button>
+        </div>
+        <p style="font-size:13px;color:var(--ink-soft);margin-bottom:12px">Import someone else's backup file to find books you have in common.</p>
+        <button class="btn btn-secondary" style="margin-bottom:12px" onclick="triggerCompare()">📂 Load Their File</button>
+        <input type="file" id="compare-file-input" accept=".json" style="display:none" onchange="handleCompare(event)">
+        <div id="compare-results"></div>
+      </div>
     </div>
 
     <!-- ── ADD VIEW ── -->
@@ -525,7 +743,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Cover Photo</label>
-          <div class="photo-upload-area" id="photo-upload-area" onclick="triggerPhotoInput()">
+          <div class="photo-upload-area" id="photo-upload-area">
             <img id="photo-preview" style="display:none">
             <span class="photo-upload-icon" id="photo-icon">📷</span>
             <span class="photo-upload-label" id="photo-hint">Tap to add cover</span>
@@ -556,6 +774,19 @@
             <div class="form-group">
               <label class="form-label" style="font-size:11px">Total in book</label>
               <input class="form-input" id="f-total-pages" type="number" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Shelf</label>
+          <div class="toggle-group">
+            <div class="toggle-row" onclick="setShelf('honour')" id="shelf-row-honour">
+              <span class="toggle-label">🏆 Honour Shelf (completed)</span>
+              <div class="toggle-switch" id="t-shelf-honour"></div>
+            </div>
+            <div class="toggle-row" onclick="setShelf('naughty')" id="shelf-row-naughty">
+              <span class="toggle-label">😈 Naughty Shelf (parked)</span>
+              <div class="toggle-switch" id="t-shelf-naughty"></div>
             </div>
           </div>
         </div>
@@ -603,6 +834,105 @@
       <div id="search-results"></div>
     </div>
 
+    <!-- ── CALENDAR VIEW ── -->
+    <div class="view" id="view-calendar">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <button class="cal-nav-btn" onclick="calNext()">›</button>
+      </div>
+      <div class="card" style="padding:12px; margin-bottom:16px;">
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+      <div id="cal-day-panel"></div>
+      <div class="divider"></div>
+      <div class="cal-events-title">📅 Upcoming</div>
+      <div id="cal-upcoming"></div>
+    </div>
+
+    <!-- ── HELP VIEW ── -->
+    <div class="view" id="view-help">
+
+      <div class="help-section">
+        <div class="help-section-title">👋 Getting Started</div>
+        <p>Your Colour Shelf lives entirely on your device — no account needed, no internet required after the first load. All your books are saved automatically as you go.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">➕ Adding a Book</div>
+        <p>Tap <strong>Add Book</strong> in the bottom menu. Fill in the title (required) and any other details you know — author, tags, how many pages the book has, and how many you've coloured so far. Tap the photo box to add a cover image from your camera roll. Hit <strong>Save Book</strong> when you're done.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">📚 Your Library</div>
+        <p>All your books appear here. Tap any book to see its details, mark it as used, or edit it.</p>
+        <p>Use the <strong>Sort</strong> buttons to order your library by title, author, or pages coloured.</p>
+        <p>Use the <strong>Filter</strong> buttons to narrow down what you see — physical books, digital books, used, unused, or hide books you've fully completed.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🏆😈 Honour & Naughty Shelves</div>
+        <p>To move a book to a special shelf, tap the book → <strong>Edit</strong> → scroll to the <strong>Shelf</strong> section → toggle the shelf you want.</p>
+        <p>🏆 The <strong>Honour Shelf</strong> is for books you've finished — completed and celebrated.</p>
+        <p>😈 The <strong>Naughty Shelf</strong> is for books you've parked — started and abandoned, or ones you're not sure about.</p>
+        <p>Both shelves appear as collapsible sections at the bottom of your Library once they have books in them.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">📊 Tracking Progress</div>
+        <p>When adding or editing a book, enter the <strong>Total Pages in Book</strong> and <strong>Pages Coloured So Far</strong>. The app will calculate and display a progress bar and percentage on each book card automatically.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🔍 Searching</div>
+        <p>Tap <strong>Search</strong> in the bottom menu and type anything — the app searches book titles, authors, and tags all at once.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">📈 Stats</div>
+        <p>Tap <strong>Stats</strong> to see an overview of your collection — total books, how many you've used, physical vs digital breakdown, total pages coloured across all books, and a table of your most collected authors.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">📅 Calendar</div>
+        <p>Tap <strong>Calendar</strong> to plan your colouring projects. Tap any date to select it, then tap <strong>Add event on this day</strong> to create an event with a name and notes. Upcoming events appear in a list below the calendar.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">📤 Sharing Your List</div>
+        <p>From the top of the Library screen, tap <strong>Share List</strong> to send a plain text version of your books via WhatsApp, Messages, email, or any other app on your phone.</p>
+        <p>Tap <strong>Share File</strong> to export your full data as a file — useful for sending to another Colour Shelf user so they can import it directly.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🔀 Comparing Lists</div>
+        <p>Tap <strong>Compare Lists</strong> at the top of the Library. Load someone else's exported backup file and the app will instantly show which books you have in common and which ones are only in their list.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">💾 Backing Up Your Data</div>
+        <p>Tap <strong>Change Theme 🎨</strong> in the top right → scroll down to <strong>Your Data</strong> → tap <strong>Export Backup</strong>. This saves a file to your phone containing all your books and photos.</p>
+        <p>To restore after reinstalling: open the app, go to Change Theme → Your Data → <strong>Import Backup</strong>, and select your saved file.</p>
+        <p>⚠️ <strong>iPhone users especially:</strong> Apple can clear app data if your phone runs low on storage. Export a backup regularly and keep it somewhere safe like iCloud or email it to yourself.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🎨 Changing the Colour Theme</div>
+        <p>Tap the <strong>Change Theme 🎨</strong> button in the top right corner. Choose from one of the preset colour schemes, or tap the colour circles under Custom Colours to pick your own exact colours.</p>
+      </div>
+
+      <div class="help-beta">
+        <div class="help-beta-title">📣 Beta Version</div>
+        <p>This app is currently in beta — it's a work in progress and you may encounter occasional bugs or rough edges. Thank you for your patience while we improve it!</p>
+        <p style="margin-top:8px">If you run into any issues or have suggestions, please reach out to <strong>@cryptidcolouring</strong> on Instagram.</p>
+      </div>
+
+      <div class="help-disclaimer">
+        <em>Colour Shelf is provided as-is. All data is stored locally on your device and is outside our control — we have no ability to access, recover, or restore it. This app operates entirely within its own storage and does not interact with, modify, or access anything else on your device. We cannot be held responsible for any loss of data within the app or issues arising from use. Regular backups are strongly recommended.</em>
+      </div>
+
+    </div>
+
   </main>
 
   <!-- Bottom Nav -->
@@ -612,6 +942,9 @@
     </button>
     <button class="nav-btn" data-view="add" onclick="newBook()">
       <span class="icon">➕</span>Add Book
+    </button>
+    <button class="nav-btn" data-view="calendar" onclick="showView('calendar')">
+      <span class="icon">📅</span>Calendar
     </button>
     <button class="nav-btn" data-view="stats" onclick="showView('stats')">
       <span class="icon">📊</span>Stats
@@ -672,6 +1005,24 @@
 
     <div class="divider"></div>
     <button class="btn btn-secondary" onclick="closeSettings()">Done</button>
+  </div>
+</div>
+
+<!-- Calendar event sheet -->
+<div class="overlay" id="cal-overlay" onclick="closeCalOverlay(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="cal-sheet-title">Add Event</div>
+    <div class="form-group">
+      <label class="form-label">Event Name *</label>
+      <input class="form-input" id="cal-f-name" placeholder="e.g. Buddy Colour — Forest Theme" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="cal-f-notes" placeholder="e.g. Pages 12-14, green palette" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="saveCalEvent()" style="margin-bottom:8px">✅ Save Event</button>
+    <button class="btn btn-secondary" onclick="closeCalOverlay()">Cancel</button>
   </div>
 </div>
 
@@ -739,8 +1090,9 @@ function removePhoto(e) {
 
 // ── IndexedDB Storage ─────────────────────────────────────────
 const DB_NAME    = 'colour_bookshelf_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE      = 'books';
+const CAL_STORE  = 'cal_events';
 let db = null;
 
 function openDB() {
@@ -748,9 +1100,8 @@ function openDB() {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = e => {
       const d = e.target.result;
-      if (!d.objectStoreNames.contains(STORE)) {
-        d.createObjectStore(STORE, { keyPath: 'id' });
-      }
+      if (!d.objectStoreNames.contains(STORE))      d.createObjectStore(STORE,      { keyPath: 'id' });
+      if (!d.objectStoreNames.contains(CAL_STORE))  d.createObjectStore(CAL_STORE,  { keyPath: 'id' });
     };
     req.onsuccess = e => { db = e.target.result; resolve(db); };
     req.onerror   = e => reject(e.target.error);
@@ -802,9 +1153,10 @@ function showView(name) {
   document.getElementById('view-' + name).classList.add('active');
   const nb = document.querySelector(`.nav-btn[data-view="${name}"]`);
   if (nb) nb.classList.add('active');
-  if (name === 'library') renderLibrary();
-  if (name === 'stats') renderStats();
-  updateHeader();
+  if (name === 'library')  renderLibrary();
+  if (name === 'stats')    renderStats();
+  if (name === 'calendar') renderCalendar();
+  if (name !== 'help') updateHeader();
 }
 
 // ── Header ────────────────────────────────────────────────────
@@ -818,13 +1170,21 @@ function updateHeader() {
 
 // ── Library ───────────────────────────────────────────────────
 function renderLibrary() {
-  let list = [...books];
-  // Filter
-  if (activeFilters.has('physical')) list = list.filter(b => b.physical);
-  if (activeFilters.has('digital'))  list = list.filter(b => b.digital);
-  if (activeFilters.has('used'))     list = list.filter(b => b.used);
-  if (activeFilters.has('unused'))   list = list.filter(b => !b.used);
-  // Sort
+  // Separate into shelves
+  const mainBooks    = books.filter(b => !b.shelf);
+  const honourBooks  = books.filter(b => b.shelf === 'honour');
+  const naughtyBooks = books.filter(b => b.shelf === 'naughty');
+
+  // Apply filters + sort to main list
+  let list = [...mainBooks];
+  if (activeFilters.has('physical'))     list = list.filter(b => b.physical);
+  if (activeFilters.has('digital'))      list = list.filter(b => b.digital);
+  if (activeFilters.has('used'))         list = list.filter(b => b.used);
+  if (activeFilters.has('unused'))       list = list.filter(b => !b.used);
+  if (activeFilters.has('hidecomplete')) list = list.filter(b => {
+    if (!b.totalPages || b.totalPages === 0) return true;
+    return (b.pages || 0) < b.totalPages;
+  });
   if (currentSort === 'title')  list.sort((a,b) => (a.title||'').localeCompare(b.title||''));
   if (currentSort === 'author') list.sort((a,b) => (a.author||'').localeCompare(b.author||''));
   if (currentSort === 'pages')  list.sort((a,b) => (b.pages||0) - (a.pages||0));
@@ -835,56 +1195,21 @@ function renderLibrary() {
     : `${list.length} book${list.length !== 1 ? 's' : ''}`;
 
   const el = document.getElementById('book-list');
-  if (list.length === 0 && books.length === 0) {
+  if (list.length === 0 && mainBooks.length === 0 && books.length === 0) {
     el.innerHTML = `<div class="empty-state">
       <div class="big-emoji">🎨</div>
       <h3>Your shelf is empty</h3>
       <p>Tap <strong>Add Book</strong> below to start tracking your colouring collection.</p>
     </div>`;
-    return;
-  }
-  if (list.length === 0) {
+  } else if (list.length === 0) {
     el.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>No matches</h3><p>Try removing some filters.</p></div>`;
-    return;
+  } else {
+    el.innerHTML = list.map(b => bookCardHTML(b)).join('');
   }
 
-  el.innerHTML = list.map(b => {
-    const badges = [];
-    if (b.physical) badges.push(`<span class="badge badge-physical">📚 Physical</span>`);
-    if (b.digital)  badges.push(`<span class="badge badge-digital">💻 Digital</span>`);
-    badges.push(b.used
-      ? `<span class="badge badge-used">✅ Used</span>`
-      : `<span class="badge badge-unused">⏳ Not started</span>`);
-    const tags = b.tags ? `<div class="book-card-tags">🏷 ${b.tags}</div>` : '';
-    const pages = b.pages > 0 ? `<span class="book-card-pages">🖍 ${b.pages} pages</span>` : '';
-
-    // Completion bar
-    let completionHtml = '';
-    if (b.totalPages > 0) {
-      const pct = Math.min(100, Math.round((b.pages || 0) / b.totalPages * 100));
-      completionHtml = `
-        <div class="completion-bar-wrap"><div class="completion-bar-fill" style="width:${pct}%"></div></div>
-        <div class="completion-label">${pct}% complete (${b.pages||0} / ${b.totalPages} pages)</div>`;
-    }
-
-    // Cover photo or placeholder
-    const coverHtml = b.photo
-      ? `<img class="book-cover" src="${b.photo}" alt="cover">`
-      : `<div class="book-cover-placeholder" onclick="event.stopPropagation();quickAddPhoto('${b.id}')">📷</div>`;
-
-    return `<div class="book-card${b.used ? ' used' : ''}" onclick="openBook('${b.id}')">
-      <div class="book-card-inner">
-        ${coverHtml}
-        <div class="book-card-body">
-          <div class="book-card-title">${esc(b.title)}</div>
-          <div class="book-card-author">${b.author ? '✍️ ' + esc(b.author) : '<i>No author</i>'}</div>
-          <div class="book-card-meta">${badges.join('')}${pages}</div>
-          ${tags}
-          ${completionHtml}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  // Render special shelves
+  renderShelf('honour', honourBooks);
+  renderShelf('naughty', naughtyBooks);
 }
 
 // Sort pills
@@ -911,7 +1236,145 @@ document.querySelectorAll('.filter-pill').forEach(btn => {
   });
 });
 
-// ── Book sheet (quick view from library) ──────────────────────
+// ── Book card HTML helper ─────────────────────────────────────
+function bookCardHTML(b) {
+  const badges = [];
+  if (b.physical) badges.push(`<span class="badge badge-physical">📚 Physical</span>`);
+  if (b.digital)  badges.push(`<span class="badge badge-digital">💻 Digital</span>`);
+  badges.push(b.used
+    ? `<span class="badge badge-used">✅ Used</span>`
+    : `<span class="badge badge-unused">⏳ Not started</span>`);
+  const tags = b.tags ? `<div class="book-card-tags">🏷 ${esc(b.tags)}</div>` : '';
+  const pages = b.pages > 0 ? `<span class="book-card-pages">🖍 ${b.pages} pages</span>` : '';
+  let completionHtml = '';
+  if (b.totalPages > 0) {
+    const pct = Math.min(100, Math.round((b.pages || 0) / b.totalPages * 100));
+    completionHtml = `
+      <div class="completion-bar-wrap"><div class="completion-bar-fill" style="width:${pct}%"></div></div>
+      <div class="completion-label">${pct}% complete (${b.pages||0} / ${b.totalPages} pages)</div>`;
+  }
+  const coverHtml = (b.photo && safePhoto(b.photo))
+    ? `<img class="book-cover" src="${b.photo}" alt="cover">`
+    : `<div class="book-cover-placeholder" onclick="event.stopPropagation();quickAddPhoto('${b.id}')">📷</div>`;
+  return `<div class="book-card${b.used ? ' used' : ''}" onclick="openBook('${b.id}')">
+    <div class="book-card-inner">
+      ${coverHtml}
+      <div class="book-card-body">
+        <div class="book-card-title">${esc(b.title)}</div>
+        <div class="book-card-author">${b.author ? '✍️ ' + esc(b.author) : '<i>No author</i>'}</div>
+        <div class="book-card-meta">${badges.join('')}${pages}</div>
+        ${tags}${completionHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Shelf rendering ───────────────────────────────────────────
+function renderShelf(type, shelfBooks) {
+  const section = document.getElementById(`${type}-section`);
+  const body    = document.getElementById(`shelf-body-${type}`);
+  if (shelfBooks.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  body.innerHTML = shelfBooks.map(b => bookCardHTML(b)).join('');
+}
+
+function toggleShelf(type) {
+  const body    = document.getElementById(`shelf-body-${type}`);
+  const chevron = document.getElementById(`chevron-${type}`);
+  const open    = body.classList.toggle('open');
+  chevron.classList.toggle('open', open);
+}
+
+// ── Shelf form controls ───────────────────────────────────────
+let currentShelf = null;
+
+function setShelf(type) {
+  if (currentShelf === type) {
+    currentShelf = null;
+  } else {
+    currentShelf = type;
+  }
+  document.getElementById('t-shelf-honour').classList.toggle('on', currentShelf === 'honour');
+  document.getElementById('t-shelf-naughty').classList.toggle('on', currentShelf === 'naughty');
+}
+
+// ── Share functions ───────────────────────────────────────────
+function shareAsText() {
+  const mainBooks = books.filter(b => !b.shelf);
+  if (mainBooks.length === 0) { showToast('No books to share'); return; }
+  const lines = mainBooks.map(b => {
+    let line = `• ${b.title}`;
+    if (b.author) line += ` by ${b.author}`;
+    if (b.tags)   line += ` [${b.tags}]`;
+    if (b.used)   line += ' ✅';
+    return line;
+  });
+  const text = `My Colour Shelf (${mainBooks.length} books)\n\n${lines.join('\n')}`;
+  if (navigator.share) {
+    navigator.share({ title: 'My Colour Shelf', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('📋 Copied to clipboard!'));
+  }
+}
+
+function shareAsFile() {
+  exportData();
+}
+
+// ── Compare functions ─────────────────────────────────────────
+function openCompare() {
+  const s = document.getElementById('compare-section');
+  s.style.display = s.style.display === 'none' ? 'block' : 'none';
+}
+
+function triggerCompare() {
+  document.getElementById('compare-file-input').click();
+}
+
+function handleCompare(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const payload = JSON.parse(ev.target.result);
+      if (!Array.isArray(payload.books || payload)) throw new Error();
+
+      // Sanitise and normalise
+      const theirBooks = (payload.books || payload).map(sanitiseBook).filter(b => b.title);
+      const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+      const common      = theirBooks.filter(b => myTitles.has(norm(b.title)));
+      const onlyTheirs  = theirBooks.filter(b => !myTitles.has(norm(b.title)));
+
+      const el = document.getElementById('compare-results');
+      el.innerHTML = `
+        <div style="margin-bottom:12px">
+          <strong style="color:var(--terracotta)">${common.length} book${common.length!==1?'s':''} in common</strong>
+          <span style="font-size:12px;color:var(--ink-soft);margin-left:6px">out of ${theirBooks.length} in their list</span>
+        </div>
+        ${common.length > 0 ? `
+          <div style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--ink-mid)">✅ Books you both have:</div>
+          ${common.map(b => `<div class="result-card" style="cursor:default">
+            <div>
+              <div class="result-title">${esc(b.title)}</div>
+              ${b.author ? `<div class="result-author">✍️ ${esc(b.author)}</div>` : ''}
+            </div>
+            <span class="compare-badge compare-match">Common</span>
+          </div>`).join('')}` : ''}
+        ${onlyTheirs.length > 0 ? `
+          <div style="font-weight:700;font-size:13px;margin:12px 0 6px;color:var(--ink-mid)">📚 Only in their list:</div>
+          ${onlyTheirs.map(b => `<div class="result-card" style="cursor:default">
+            <div>
+              <div class="result-title">${esc(b.title)}</div>
+              ${b.author ? `<div class="result-author">✍️ ${esc(b.author)}</div>` : ''}
+            </div>
+            <span class="compare-badge compare-unique">Theirs only</span>
+          </div>`).join('')}` : ''}`;
+    } catch { showToast('❌ Could not read that file'); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
 function openBook(id) {
   const b = books.find(x => x.id === id);
   if (!b) return;
@@ -936,7 +1399,7 @@ function openBook(id) {
   }
 
   // Cover photo
-  const photoHtml = b.photo
+  const photoHtml = (b.photo && safePhoto(b.photo))
     ? `<img src="${b.photo}" style="width:80px;height:80px;border-radius:8px;object-fit:cover;border:2px solid var(--parchment);flex-shrink:0">`
     : '';
 
@@ -1008,6 +1471,9 @@ function editBook(id) {
   toggleState.digital  = !!b.digital;
   toggleState.used     = !!b.used;
   updateToggles();
+  currentShelf = b.shelf || null;
+  document.getElementById('t-shelf-honour').classList.toggle('on', currentShelf === 'honour');
+  document.getElementById('t-shelf-naughty').classList.toggle('on', currentShelf === 'naughty');
   // Load photo if exists
   currentPhoto = b.photo || null;
   if (currentPhoto) { showPhotoPreview(currentPhoto); }
@@ -1026,6 +1492,9 @@ function resetForm() {
   document.getElementById('f-total-pages').value = '';
   toggleState = { physical: false, digital: false, used: false };
   updateToggles();
+  currentShelf = null;
+  document.getElementById('t-shelf-honour').classList.remove('on');
+  document.getElementById('t-shelf-naughty').classList.remove('on');
   currentPhoto = null;
   const preview = document.getElementById('photo-preview');
   preview.src = ''; preview.style.display = 'none';
@@ -1058,6 +1527,7 @@ async function saveBook() {
     physical: toggleState.physical,
     digital:  toggleState.digital,
     used:     toggleState.used,
+    shelf:    currentShelf || null,
     photo:    currentPhoto || null,
   };
   if (editingId) {
@@ -1090,11 +1560,18 @@ function updateAuthorList() {
 
 // ── Stats ─────────────────────────────────────────────────────
 function renderStats() {
-  const total    = books.length;
-  const used     = books.filter(b => b.used).length;
-  const physical = books.filter(b => b.physical).length;
-  const digital  = books.filter(b => b.digital).length;
-  const totalPages = books.reduce((s, b) => s + (b.pages || 0), 0);
+  const total       = books.length;
+  const used        = books.filter(b => b.used).length;
+  const physical    = books.filter(b => b.physical).length;
+  const digital     = books.filter(b => b.digital).length;
+  const totalPages  = books.reduce((s, b) => s + (b.pages || 0), 0);
+
+  // Pages coloured vs total pages (only books where total pages is set)
+  const booksWithTotal  = books.filter(b => b.totalPages > 0);
+  const sumTotalPages   = booksWithTotal.reduce((s, b) => s + b.totalPages, 0);
+  const sumColouredPages = booksWithTotal.reduce((s, b) => s + (b.pages || 0), 0);
+  const pctPages = sumTotalPages > 0 ? Math.min(100, Math.round(sumColouredPages / sumTotalPages * 100)) : null;
+
   const pctUsed  = total > 0 ? Math.round(used / total * 100) : 0;
   const physUsed = physical > 0 ? Math.round(books.filter(b => b.physical && b.used).length / physical * 100) : 0;
 
@@ -1133,7 +1610,16 @@ function renderStats() {
       <span style="font-weight:700;color:var(--sage)">${physUsed}%</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${physUsed}%;background:linear-gradient(90deg,var(--sage-light),var(--sage))"></div></div>
-    <div class="progress-label"><span>${books.filter(b=>b.physical&&b.used).length} used</span><span>${physical - books.filter(b=>b.physical&&b.used).length} unused</span></div>` : ''}`;
+    <div class="progress-label"><span>${books.filter(b=>b.physical&&b.used).length} used</span><span>${physical - books.filter(b=>b.physical&&b.used).length} unused</span></div>` : ''}
+    ${pctPages !== null ? `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px">
+      <span style="font-weight:700;font-size:14px">Pages coloured</span>
+      <span style="font-weight:700;color:var(--gold)">${pctPages}%</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pctPages}%;background:linear-gradient(90deg,#E8C060,var(--gold))"></div></div>
+    <div class="progress-label"><span>${sumColouredPages.toLocaleString()} coloured</span><span>${(sumTotalPages - sumColouredPages).toLocaleString()} remaining</span></div>
+    <div style="font-size:11px;color:var(--ink-soft);margin-top:4px">Based on ${booksWithTotal.length} book${booksWithTotal.length!==1?'s':''} with a total page count set</div>` : `
+    <div style="margin-top:12px;font-size:13px;color:var(--ink-soft);font-style:italic">Add total page counts to your books to track overall colouring progress.</div>`}`;
 
   // Author table
   const authorMap = {};
@@ -1203,9 +1689,213 @@ function esc(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── Security helpers ──────────────────────────────────────────
+const MAX_FIELD   = 500;    // max chars for text fields
+const MAX_PHOTO   = 400000; // max chars for base64 photo (~300KB raw)
+const MAX_IMPORT  = 5000;   // max books in a single import
+
+function safeStr(val, maxLen = MAX_FIELD) {
+  if (typeof val !== 'string') return '';
+  return val.slice(0, maxLen);
+}
+
+function safePhoto(val) {
+  // Must be a data URI for jpeg, png, gif, or webp — nothing else allowed
+  if (typeof val !== 'string') return null;
+  if (!val.match(/^data:image\/(jpeg|png|gif|webp);base64,[A-Za-z0-9+/=]+$/)) return null;
+  if (val.length > MAX_PHOTO) return null;
+  return val;
+}
+
+function sanitiseBook(raw) {
+  // Rebuild book from scratch — never trust imported object shape
+  return {
+    id:         safeStr(raw.id, 64).replace(/[^a-zA-Z0-9_-]/g, '') || uid(),
+    title:      safeStr(raw.title),
+    author:     safeStr(raw.author),
+    tags:       safeStr(raw.tags),
+    pages:      Math.max(0, Math.min(99999, parseInt(raw.pages)  || 0)),
+    totalPages: Math.max(0, Math.min(99999, parseInt(raw.totalPages) || 0)),
+    physical:   !!raw.physical,
+    digital:    !!raw.digital,
+    used:       !!raw.used,
+    shelf:      ['honour','naughty'].includes(raw.shelf) ? raw.shelf : null,
+    photo:      safePhoto(raw.photo),
+  };
+}
+
 // ── PWA ───────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}
+
+// ── Calendar ──────────────────────────────────────────────────
+let calEvents   = []; // {id, date:'YYYY-MM-DD', name, notes}
+let calYear     = new Date().getFullYear();
+let calMonth    = new Date().getMonth();
+let calSelected = null; // 'YYYY-MM-DD'
+let calEditId   = null;
+
+async function dbGetAllCal() {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(CAL_STORE, 'readonly');
+    const req = tx.objectStore(CAL_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+async function dbPutCal(ev) {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(CAL_STORE, 'readwrite');
+    const req = tx.objectStore(CAL_STORE).put(ev);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+async function dbDeleteCal(id) {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(CAL_STORE, 'readwrite');
+    const req = tx.objectStore(CAL_STORE).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function renderCalendar() {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  document.getElementById('cal-month-label').textContent = `${MONTHS[calMonth]} ${calYear}`;
+
+  const today     = new Date(); today.setHours(0,0,0,0);
+  const firstDay  = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+
+  // Build set of dates with events
+  const eventDates = new Set(calEvents.map(e => e.date));
+
+  let html = DAYS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+  // Prev month padding
+  for (let i = firstDay - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month">${daysInPrev - i}</div>`;
+  }
+
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cellDate = new Date(calYear, calMonth, d);
+    const isToday  = cellDate.getTime() === today.getTime();
+    const hasEvent = eventDates.has(dateStr);
+    const isSelected = dateStr === calSelected;
+    html += `<div class="cal-day${isToday?' today':''}${hasEvent?' has-event':''}${isSelected?' selected':''}"
+      onclick="selectCalDay('${dateStr}')">${d}</div>`;
+  }
+
+  // Next month padding
+  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+  for (let d = 1; d <= totalCells - firstDay - daysInMonth; d++) {
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+  renderCalDayPanel();
+  renderUpcoming();
+}
+
+function selectCalDay(dateStr) {
+  calSelected = dateStr;
+  renderCalendar();
+}
+
+function renderCalDayPanel() {
+  const el = document.getElementById('cal-day-panel');
+  if (!calSelected) { el.innerHTML = ''; return; }
+  const [y,m,d] = calSelected.split('-');
+  const label = new Date(+y, +m-1, +d).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+  const dayEvents = calEvents.filter(e => e.date === calSelected);
+
+  el.innerHTML = `
+    <div class="cal-events-title">${label}</div>
+    ${dayEvents.map(e => `
+      <div class="cal-event-card">
+        <div>
+          <div class="cal-event-name">${esc(e.name)}</div>
+          ${e.notes ? `<div class="cal-event-notes">${esc(e.notes)}</div>` : ''}
+        </div>
+        <button class="cal-event-delete" onclick="deleteCalEvent('${e.id}')">🗑</button>
+      </div>`).join('')}
+    <button class="cal-add-btn" onclick="openCalAdd()">＋ Add event on this day</button>`;
+}
+
+function renderUpcoming() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = calEvents
+    .filter(e => new Date(e.date) >= today)
+    .sort((a,b) => a.date.localeCompare(b.date))
+    .slice(0, 10);
+  const el = document.getElementById('cal-upcoming');
+  if (upcoming.length === 0) {
+    el.innerHTML = `<div style="color:var(--ink-soft);font-size:13px;padding:8px 0">No upcoming events.</div>`;
+    return;
+  }
+  el.innerHTML = upcoming.map(e => {
+    const dt  = new Date(e.date + 'T00:00:00');
+    const day = dt.getDate();
+    const mon = dt.toLocaleDateString('en-GB', { month:'short' });
+    return `<div class="upcoming-event" onclick="selectCalDay('${e.date}')">
+      <div class="upcoming-date">
+        <div class="upcoming-day-num">${day}</div>
+        <div class="upcoming-month">${mon}</div>
+      </div>
+      <div>
+        <div class="upcoming-name">${esc(e.name)}</div>
+        ${e.notes ? `<div class="upcoming-notes">${esc(e.notes)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+function openCalAdd() {
+  calEditId = null;
+  document.getElementById('cal-sheet-title').textContent = `Add Event`;
+  document.getElementById('cal-f-name').value = '';
+  document.getElementById('cal-f-notes').value = '';
+  document.getElementById('cal-overlay').classList.add('open');
+}
+
+async function saveCalEvent() {
+  const name = document.getElementById('cal-f-name').value.trim();
+  if (!name) { showToast('⚠️ Please enter an event name'); return; }
+  const ev = {
+    id:    calEditId || uid(),
+    date:  calSelected,
+    name,
+    notes: document.getElementById('cal-f-notes').value.trim(),
+  };
+  await dbPutCal(ev);
+  const idx = calEvents.findIndex(e => e.id === ev.id);
+  if (idx >= 0) calEvents[idx] = ev; else calEvents.push(ev);
+  closeCalOverlay();
+  renderCalendar();
+  showToast('✅ Event saved!');
+}
+
+async function deleteCalEvent(id) {
+  if (!confirm('Delete this event?')) return;
+  await dbDeleteCal(id);
+  calEvents = calEvents.filter(e => e.id !== id);
+  renderCalendar();
+  showToast('🗑 Event deleted');
+}
+
+function closeCalOverlay(e) {
+  if (!e || e.target === document.getElementById('cal-overlay')) {
+    document.getElementById('cal-overlay').classList.remove('open');
+  }
 }
 
 // ── Theme Engine ──────────────────────────────────────────────
@@ -1431,11 +2121,21 @@ function triggerImport() {
 async function handleImport(e) {
   const file = e.target.files[0];
   if (!file) return;
+  // Reject absurdly large files outright (>50MB)
+  if (file.size > 50 * 1024 * 1024) {
+    showToast('❌ File is too large to import');
+    e.target.value = '';
+    return;
+  }
   try {
     const text = await file.text();
     const payload = JSON.parse(text);
-    const imported = payload.books || payload; // support both formats
-    if (!Array.isArray(imported)) throw new Error('Invalid format');
+    const raw = payload.books || payload;
+    if (!Array.isArray(raw)) throw new Error('Invalid format');
+    if (raw.length > MAX_IMPORT) throw new Error('Too many books');
+
+    // Sanitise every book before touching the DB
+    const imported = raw.map(sanitiseBook).filter(b => b.title);
 
     const existing = books.length;
     const msg = existing > 0
@@ -1443,11 +2143,9 @@ async function handleImport(e) {
       : `Import ${imported.length} book(s)?`;
     if (!confirm(msg)) return;
 
-    // Merge — skip duplicates by id
     const existingIds = new Set(books.map(b => b.id));
     let added = 0;
     for (const book of imported) {
-      if (!book.id || !book.title) continue;
       if (!existingIds.has(book.id)) {
         books.push(book);
         await dbPut(book);
@@ -1456,7 +2154,7 @@ async function handleImport(e) {
     }
     renderLibrary(); updateHeader();
     showToast(`✅ Imported ${added} book${added !== 1 ? 's' : ''}!`);
-  } catch {
+  } catch (err) {
     showToast('❌ Could not read that file');
   }
   e.target.value = '';
@@ -1464,10 +2162,10 @@ async function handleImport(e) {
 
 // ── Init ──────────────────────────────────────────────────────
 (async () => {
-  // Migrate any existing localStorage data into IndexedDB
   const STORAGE_KEY = 'colour_bookshelf_v1';
   await openDB();
-  books = await dbGetAll();
+  books     = await dbGetAll();
+  calEvents = await dbGetAllCal();
 
   // One-time migration from old localStorage if IDB is empty
   if (books.length === 0) {
