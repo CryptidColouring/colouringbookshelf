@@ -601,21 +601,18 @@
   .upcoming-name { font-weight: 700; font-size: 13px; color: var(--ink); }
   .upcoming-notes { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
 
+  /* ── Settings nav rows ── */
+  .settings-nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 4px; cursor: pointer; border-bottom: 1px solid var(--cream-dark);
+    font-size: 15px; font-weight: 600; color: var(--ink);
+    transition: color 0.15s;
+  }
+  .settings-nav-row:active { color: var(--terracotta); }
+  .settings-nav-arrow { font-size: 20px; color: var(--ink-soft); font-weight: 400; }
+
   /* ── 5-item nav ── */
   .nav-btn { font-size: 10px; }
-
-  /* ── Help button ── */
-  .header-help {
-    background: rgba(255,255,255,0.18);
-    border: none; border-radius: 12px;
-    padding: 5px 8px;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    font-size: 20px; cursor: pointer;
-    transition: background 0.15s;
-    flex-shrink: 0;
-  }
-  .header-help:active { background: rgba(255,255,255,0.32); }
-  .header-help-label { font-size: 10px; font-weight: 700; opacity: 0.9; font-family: 'Nunito', sans-serif; }
 
   /* ── Help content ── */
   .help-section {
@@ -667,11 +664,8 @@
       <h1>Colour Shelf</h1>
       <div class="header-sub" id="header-sub">Loading…</div>
     </div>
-    <button class="header-help" onclick="showView('help')" title="Help & Guide">
-      ❓<span class="header-help-label">Help</span>
-    </button>
-    <button class="header-gear" onclick="openSettings()" title="Colour Settings">
-      🎨<span class="header-gear-label">Change Theme</span>
+    <button class="header-gear" onclick="openSettings()" title="Settings">
+      ⚙️<span class="header-gear-label">Settings</span>
     </button>
   </header>
 
@@ -968,14 +962,20 @@
 <div class="overlay" id="settings-overlay" onclick="closeSettings(event)">
   <div class="sheet" id="settings-sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">🎨 Colour Scheme</div>
+    <div class="sheet-title">⚙️ Settings</div>
 
-    <div class="settings-section-title">✨ Presets</div>
-    <div class="theme-grid" id="theme-grid"></div>
+    <!-- Nav rows -->
+    <div class="settings-nav-row" onclick="closeSettings(); showView('help')">
+      <span>❓ Help &amp; Guide</span>
+      <span class="settings-nav-arrow">›</span>
+    </div>
 
     <div class="divider"></div>
+    <div class="settings-section-title">🎨 Colour Theme</div>
+    <div class="settings-section-title" style="font-size:13px;font-weight:600;margin-bottom:10px">✨ Presets</div>
+    <div class="theme-grid" id="theme-grid"></div>
 
-    <div class="settings-section-title">🖌 Custom colours</div>
+    <div class="settings-section-title" style="font-size:13px;font-weight:600;margin-bottom:10px">🖌 Custom colours</div>
     <div class="picker-row">
       <div>
         <div class="picker-label">Primary colour</div>
@@ -1607,16 +1607,16 @@ function renderStats() {
     ${physical > 0 ? `
     <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px">
       <span style="font-weight:700;font-size:14px">Physical used</span>
-      <span style="font-weight:700;color:var(--sage)">${physUsed}%</span>
+      <span style="font-weight:700;color:var(--terracotta)">${physUsed}%</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${physUsed}%;background:linear-gradient(90deg,var(--sage-light),var(--sage))"></div></div>
     <div class="progress-label"><span>${books.filter(b=>b.physical&&b.used).length} used</span><span>${physical - books.filter(b=>b.physical&&b.used).length} unused</span></div>` : ''}
     ${pctPages !== null ? `
     <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px">
       <span style="font-weight:700;font-size:14px">Pages coloured</span>
-      <span style="font-weight:700;color:var(--gold)">${pctPages}%</span>
+      <span style="font-weight:700;color:var(--terracotta)">${pctPages}%</span>
     </div>
-    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pctPages}%;background:linear-gradient(90deg,#E8C060,var(--gold))"></div></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pctPages}%"></div></div>
     <div class="progress-label"><span>${sumColouredPages.toLocaleString()} coloured</span><span>${(sumTotalPages - sumColouredPages).toLocaleString()} remaining</span></div>
     <div style="font-size:11px;color:var(--ink-soft);margin-top:4px">Based on ${booksWithTotal.length} book${booksWithTotal.length!==1?'s':''} with a total page count set</div>` : `
     <div style="margin-top:12px;font-size:13px;color:var(--ink-soft);font-style:italic">Add total page counts to your books to track overall colouring progress.</div>`}`;
@@ -1819,11 +1819,14 @@ function renderCalDayPanel() {
     <div class="cal-events-title">${label}</div>
     ${dayEvents.map(e => `
       <div class="cal-event-card">
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="cal-event-name">${esc(e.name)}</div>
           ${e.notes ? `<div class="cal-event-notes">${esc(e.notes)}</div>` : ''}
         </div>
-        <button class="cal-event-delete" onclick="deleteCalEvent('${e.id}')">🗑</button>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="cal-event-delete" onclick="openCalEdit('${e.id}')">✏️</button>
+          <button class="cal-event-delete" onclick="deleteCalEvent('${e.id}')">🗑</button>
+        </div>
       </div>`).join('')}
     <button class="cal-add-btn" onclick="openCalAdd()">＋ Add event on this day</button>`;
 }
@@ -1861,9 +1864,19 @@ function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
 
 function openCalAdd() {
   calEditId = null;
-  document.getElementById('cal-sheet-title').textContent = `Add Event`;
+  document.getElementById('cal-sheet-title').textContent = 'Add Event';
   document.getElementById('cal-f-name').value = '';
   document.getElementById('cal-f-notes').value = '';
+  document.getElementById('cal-overlay').classList.add('open');
+}
+
+function openCalEdit(id) {
+  const ev = calEvents.find(e => e.id === id);
+  if (!ev) return;
+  calEditId = id;
+  document.getElementById('cal-sheet-title').textContent = 'Edit Event';
+  document.getElementById('cal-f-name').value = ev.name;
+  document.getElementById('cal-f-notes').value = ev.notes || '';
   document.getElementById('cal-overlay').classList.add('open');
 }
 
