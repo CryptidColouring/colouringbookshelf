@@ -1,6 +1,6 @@
 {
-  "name": "Colouring Bookshelf",
-  "short_name": "ColourShelf",
+  "name": "Colour Shelf",
+  "short_name": "Colour Shelf",
   "description": "Track your colouring book collection — sort by author, tag, and pages coloured. Works fully offline.",
   "id": "/colouring-bookshelf/",
   "start_url": "./index.html",
@@ -32,7 +32,7 @@
       "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "label": "Colouring Bookshelf app"
+      "label": "Colour Shelf app"
     }
   ]
 }
