@@ -1021,6 +1021,42 @@
       <label class="form-label">Notes</label>
       <input class="form-input" id="cal-f-notes" placeholder="e.g. Pages 12-14, green palette" autocomplete="off">
     </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <div class="toggle-group">
+        <div class="toggle-row" onclick="setCalStatus('done')">
+          <span class="toggle-label">✅ Completed</span>
+          <div class="toggle-switch" id="t-cal-done"></div>
+        </div>
+        <div class="toggle-row" onclick="setCalStatus('skipped')">
+          <span class="toggle-label">❌ Skipped</span>
+          <div class="toggle-switch" id="t-cal-skipped"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="toggle-group">
+        <div class="toggle-row" onclick="toggleReminder()">
+          <span class="toggle-label">🔔 Remind me</span>
+          <div class="toggle-switch" id="t-reminder"></div>
+        </div>
+      </div>
+      <div id="reminder-options" style="display:none;margin-top:12px;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+          <label class="form-label" style="margin:0;white-space:nowrap">At time</label>
+          <input class="form-input" type="time" id="cal-f-reminder-time" value="09:00" style="flex:1">
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <label class="form-label" style="margin:0;white-space:nowrap">How far before</label>
+          <select class="form-input" id="cal-f-reminder-days" style="flex:1">
+            <option value="0">On the day</option>
+            <option value="1">1 day before</option>
+            <option value="2">2 days before</option>
+            <option value="7">1 week before</option>
+          </select>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-primary" onclick="saveCalEvent()" style="margin-bottom:8px">✅ Save Event</button>
     <button class="btn btn-secondary" onclick="closeCalOverlay()">Cancel</button>
   </div>
@@ -1817,17 +1853,37 @@ function renderCalDayPanel() {
 
   el.innerHTML = `
     <div class="cal-events-title">${label}</div>
-    ${dayEvents.map(e => `
-      <div class="cal-event-card">
+    ${dayEvents.map(e => {
+      const isDone    = e.status === 'done';
+      const isSkipped = e.status === 'skipped';
+      const cardStyle = isDone
+        ? 'border-left-color:#4CAF50;background:#F1FBF1'
+        : isSkipped
+        ? 'border-left-color:#E07070;background:#FDF1F1'
+        : '';
+      const statusBadge = isDone
+        ? `<span style="font-size:11px;font-weight:700;color:#2E7D32;background:#C8E6C9;padding:2px 8px;border-radius:10px;white-space:nowrap">✅ Done</span>`
+        : isSkipped
+        ? `<span style="font-size:11px;font-weight:700;color:#C62828;background:#FFCDD2;padding:2px 8px;border-radius:10px;white-space:nowrap">❌ Skipped</span>`
+        : '';
+      const hasReminder = ev.reminder?.enabled;
+      const reminderBadge = hasReminder
+        ? `<span style="font-size:11px;font-weight:700;color:#1565C0;background:#BBDEFB;padding:2px 8px;border-radius:10px;white-space:nowrap">🔔 ${ev.reminder.time}${ev.reminder.daysBefore > 0 ? ` · ${ev.reminder.daysBefore}d before` : ''}</span>`
+        : '';
+      return `<div class="cal-event-card" style="${cardStyle}">
         <div style="flex:1;min-width:0">
-          <div class="cal-event-name">${esc(e.name)}</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div class="cal-event-name">${esc(e.name)}</div>
+            ${statusBadge}${reminderBadge}
+          </div>
           ${e.notes ? `<div class="cal-event-notes">${esc(e.notes)}</div>` : ''}
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
           <button class="cal-event-delete" onclick="openCalEdit('${e.id}')">✏️</button>
           <button class="cal-event-delete" onclick="deleteCalEvent('${e.id}')">🗑</button>
         </div>
-      </div>`).join('')}
+      </div>`;
+    }).join('')}
     <button class="cal-add-btn" onclick="openCalAdd()">＋ Add event on this day</button>`;
 }
 
@@ -1843,16 +1899,29 @@ function renderUpcoming() {
     return;
   }
   el.innerHTML = upcoming.map(e => {
+    const isDone    = e.status === 'done';
+    const isSkipped = e.status === 'skipped';
+    const statusBadge = isDone
+      ? `<span style="font-size:10px;font-weight:700;color:#2E7D32;background:#C8E6C9;padding:1px 6px;border-radius:8px">✅ Done</span>`
+      : isSkipped
+      ? `<span style="font-size:10px;font-weight:700;color:#C62828;background:#FFCDD2;padding:1px 6px;border-radius:8px">❌ Skipped</span>`
+      : '';
+    const reminderBadge = e.reminder?.enabled
+      ? `<span style="font-size:10px;font-weight:700;color:#1565C0;background:#BBDEFB;padding:1px 6px;border-radius:8px">🔔 ${e.reminder.time}</span>`
+      : '';
     const dt  = new Date(e.date + 'T00:00:00');
     const day = dt.getDate();
     const mon = dt.toLocaleDateString('en-GB', { month:'short' });
-    return `<div class="upcoming-event" onclick="selectCalDay('${e.date}')">
-      <div class="upcoming-date">
+    return `<div class="upcoming-event" onclick="selectCalDay('${e.date}')" style="${isDone ? 'opacity:0.65' : isSkipped ? 'opacity:0.65' : ''}">
+      <div class="upcoming-date" style="${isDone ? 'background:#4CAF50' : isSkipped ? 'background:#E07070' : ''}">
         <div class="upcoming-day-num">${day}</div>
         <div class="upcoming-month">${mon}</div>
       </div>
-      <div>
-        <div class="upcoming-name">${esc(e.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <div class="upcoming-name">${esc(e.name)}</div>
+          ${statusBadge}${reminderBadge}
+        </div>
         ${e.notes ? `<div class="upcoming-notes">${esc(e.notes)}</div>` : ''}
       </div>
     </div>`;
@@ -1867,6 +1936,8 @@ function openCalAdd() {
   document.getElementById('cal-sheet-title').textContent = 'Add Event';
   document.getElementById('cal-f-name').value = '';
   document.getElementById('cal-f-notes').value = '';
+  setCalStatusUI(null);
+  setReminderUI(false, '09:00', 0);
   document.getElementById('cal-overlay').classList.add('open');
 }
 
@@ -1877,32 +1948,136 @@ function openCalEdit(id) {
   document.getElementById('cal-sheet-title').textContent = 'Edit Event';
   document.getElementById('cal-f-name').value = ev.name;
   document.getElementById('cal-f-notes').value = ev.notes || '';
+  setCalStatusUI(ev.status || null);
+  const r = ev.reminder || {};
+  setReminderUI(!!r.enabled, r.time || '09:00', r.daysBefore || 0);
   document.getElementById('cal-overlay').classList.add('open');
+}
+
+function setCalStatus(type) {
+  // Mutually exclusive — toggling one clears the other
+  const doneEl    = document.getElementById('t-cal-done');
+  const skippedEl = document.getElementById('t-cal-skipped');
+  if (type === 'done') {
+    const on = doneEl.classList.toggle('on');
+    if (on) skippedEl.classList.remove('on');
+  } else {
+    const on = skippedEl.classList.toggle('on');
+    if (on) doneEl.classList.remove('on');
+  }
+}
+
+function getCalStatus() {
+  if (document.getElementById('t-cal-done').classList.contains('on'))    return 'done';
+  if (document.getElementById('t-cal-skipped').classList.contains('on')) return 'skipped';
+  return null;
+}
+
+function setCalStatusUI(status) {
+  document.getElementById('t-cal-done').classList.toggle('on',    status === 'done');
+  document.getElementById('t-cal-skipped').classList.toggle('on', status === 'skipped');
+}
+
+function setReminderUI(enabled, time, daysBefore) {
+  document.getElementById('t-reminder').classList.toggle('on', enabled);
+  document.getElementById('reminder-options').style.display = enabled ? 'block' : 'none';
+  document.getElementById('cal-f-reminder-time').value = time;
+  document.getElementById('cal-f-reminder-days').value = String(daysBefore);
+}
+
+function toggleReminder() {
+  const t = document.getElementById('t-reminder');
+  const on = t.classList.toggle('on');
+  document.getElementById('reminder-options').style.display = on ? 'block' : 'none';
 }
 
 async function saveCalEvent() {
   const name = document.getElementById('cal-f-name').value.trim();
   if (!name) { showToast('⚠️ Please enter an event name'); return; }
+
+  const reminderEnabled = document.getElementById('t-reminder').classList.contains('on');
+  let reminder = null;
+  if (reminderEnabled) {
+    // Request permission if needed
+    if (Notification.permission === 'default') {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        showToast('⚠️ Notification permission denied — reminder not set');
+        return;
+      }
+    }
+    if (Notification.permission === 'granted') {
+      reminder = {
+        enabled:    true,
+        time:       document.getElementById('cal-f-reminder-time').value || '09:00',
+        daysBefore: parseInt(document.getElementById('cal-f-reminder-days').value) || 0,
+      };
+    }
+  }
+
   const ev = {
-    id:    calEditId || uid(),
-    date:  calSelected,
+    id:       calEditId || uid(),
+    date:     calSelected,
     name,
-    notes: document.getElementById('cal-f-notes').value.trim(),
+    notes:    document.getElementById('cal-f-notes').value.trim(),
+    status:   getCalStatus(),
+    reminder: reminder,
   };
   await dbPutCal(ev);
   const idx = calEvents.findIndex(e => e.id === ev.id);
   if (idx >= 0) calEvents[idx] = ev; else calEvents.push(ev);
+  scheduleNotifications();
   closeCalOverlay();
   renderCalendar();
-  showToast('✅ Event saved!');
+  showToast(reminder ? '✅ Event saved with reminder!' : '✅ Event saved!');
 }
 
 async function deleteCalEvent(id) {
   if (!confirm('Delete this event?')) return;
   await dbDeleteCal(id);
   calEvents = calEvents.filter(e => e.id !== id);
+  scheduleNotifications();
   renderCalendar();
   showToast('🗑 Event deleted');
+}
+
+// ── Notification scheduling ───────────────────────────────────
+// Tracks active setTimeout IDs so we can cancel on re-schedule
+const notifTimers = {};
+
+function scheduleNotifications() {
+  if (!('serviceWorker' in navigator) || Notification.permission !== 'granted') return;
+
+  // Cancel all existing timers
+  Object.values(notifTimers).forEach(t => clearTimeout(t));
+  Object.keys(notifTimers).forEach(k => delete notifTimers[k]);
+
+  const now = Date.now();
+  const WINDOW = 48 * 60 * 60 * 1000; // schedule up to 48hrs ahead
+
+  calEvents.forEach(ev => {
+    if (!ev.reminder?.enabled) return;
+
+    const [h, m]   = (ev.reminder.time || '09:00').split(':').map(Number);
+    const [y, mo, d] = ev.date.split('-').map(Number);
+    const fireDate = new Date(y, mo - 1, d - (ev.reminder.daysBefore || 0), h, m, 0);
+    const fireTime = fireDate.getTime();
+    const delay    = fireTime - now;
+
+    if (delay < 0 || delay > WINDOW) return; // past or too far away
+
+    notifTimers[ev.id] = setTimeout(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification('📅 Colouring Bookshelf', {
+        body: ev.reminder.daysBefore > 0
+          ? `Reminder: "${ev.name}" is ${ev.reminder.daysBefore === 1 ? 'tomorrow' : `in ${ev.reminder.daysBefore} days`}!`
+          : `"${ev.name}" is today!`,
+        icon: './icon-192.png',
+        badge: './icon-192.png',
+        tag:  ev.id, // replaces previous notification for same event
+      });
+    }, delay);
+  });
 }
 
 function closeCalOverlay(e) {
@@ -2196,6 +2371,7 @@ async function handleImport(e) {
   loadTheme();
   renderLibrary();
   updateHeader();
+  scheduleNotifications();
 })();
 </script>
 </body>
