@@ -462,13 +462,46 @@
   .color-btn {
     width: 44px; height: 44px; border-radius: 50%;
     border: 3px solid var(--parchment);
-    cursor: pointer; position: relative; overflow: hidden;
-    flex-shrink: 0;
+    cursor: pointer; flex-shrink: 0;
   }
-  .color-btn input[type=color] {
-    position: absolute; inset: -8px;
-    width: calc(100% + 16px); height: calc(100% + 16px);
-    opacity: 0; cursor: pointer; border: none; padding: 0;
+
+  /* ── Wheel picker modal ── */
+  #wheel-picker-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 300;
+    align-items: flex-end; justify-content: center;
+  }
+  #wheel-picker-overlay.open { display: flex; }
+  #wheel-picker-sheet {
+    background: var(--white); border-radius: 20px 20px 0 0;
+    padding: 20px; width: 100%; max-width: 480px;
+  }
+  .wheel-picker-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700; color: var(--ink);
+    text-align: center; margin-bottom: 16px;
+  }
+  .wheel-picker-controls {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin-bottom: 16px;
+  }
+  .wheel-slider-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .wheel-slider-label {
+    font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .wheel-preview-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--cream); border-radius: var(--radius-sm);
+    padding: 10px 14px; margin-bottom: 16px;
+  }
+  #wheel-preview-swatch {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid var(--parchment); flex-shrink: 0;
+  }
+  #wheel-preview-hex {
+    font-size: 14px; font-weight: 600; color: var(--ink); font-family: monospace;
   }
 
   .settings-section-title {
@@ -489,9 +522,11 @@
   }
   .shelf-header-honour { background: linear-gradient(135deg, #FFF8E1, #FFF3CC); border: 1.5px solid #F0C040; }
   .shelf-header-naughty { background: linear-gradient(135deg, #FDE8E8, #FCCFCF); border: 1.5px solid #E08080; }
+  .shelf-header-seasonal { background: linear-gradient(135deg, #E8F4FD, #CCE8F9); border: 1.5px solid #70B8E0; }
   .shelf-header-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
   .shelf-header-honour .shelf-header-title { color: #8B6914; }
   .shelf-header-naughty .shelf-header-title { color: #8B2020; }
+  .shelf-header-seasonal .shelf-header-title { color: #1A5C8B; }
   .shelf-chevron { font-size: 12px; transition: transform 0.2s; }
   .shelf-chevron.open { transform: rotate(180deg); }
   .shelf-body { display: none; }
@@ -556,9 +591,10 @@
     content: ''; position: absolute; bottom: 3px;
     width: 5px; height: 5px; border-radius: 50%;
     background: var(--terracotta);
+    pointer-events: none;
   }
   .cal-day.selected { background: var(--terracotta); color: white; }
-  .cal-day.selected::after { background: white; }
+  .cal-day.selected::after { background: white; pointer-events: none; }
 
   .cal-events-title {
     font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
@@ -714,6 +750,14 @@
         <div class="shelf-body" id="shelf-body-naughty"></div>
       </div>
 
+      <div class="shelf-section" id="seasonal-section" style="display:none">
+        <div class="shelf-header shelf-header-seasonal" onclick="toggleShelf('seasonal')">
+          <span class="shelf-header-title">📅 Seasonal Shelf</span>
+          <span class="shelf-chevron" id="chevron-seasonal">▼</span>
+        </div>
+        <div class="shelf-body" id="shelf-body-seasonal"></div>
+      </div>
+
       <!-- Compare panel -->
       <div class="compare-section" id="compare-section" style="display:none">
         <div class="divider"></div>
@@ -781,6 +825,10 @@
             <div class="toggle-row" onclick="setShelf('naughty')" id="shelf-row-naughty">
               <span class="toggle-label">😈 Naughty Shelf (parked)</span>
               <div class="toggle-switch" id="t-shelf-naughty"></div>
+            </div>
+            <div class="toggle-row" onclick="setShelf('seasonal')" id="shelf-row-seasonal">
+              <span class="toggle-label">📅 Seasonal Shelf</span>
+              <div class="toggle-switch" id="t-shelf-seasonal"></div>
             </div>
           </div>
         </div>
@@ -981,18 +1029,14 @@
         <div class="picker-label">Primary colour</div>
         <div class="picker-sub">Header, buttons, accents</div>
       </div>
-      <div class="color-btn" id="primary-btn" title="Pick primary colour">
-        <input type="color" id="picker-primary" oninput="onCustomChange()">
-      </div>
+      <div class="color-btn" id="primary-btn" onclick="openWheelPicker('primary')"></div>
     </div>
     <div class="picker-row">
       <div>
         <div class="picker-label">Background colour</div>
         <div class="picker-sub">App background, cards</div>
       </div>
-      <div class="color-btn" id="bg-btn" title="Pick background colour">
-        <input type="color" id="picker-bg" oninput="onCustomChange()">
-      </div>
+      <div class="color-btn" id="bg-btn" onclick="openWheelPicker('bg')"></div>
     </div>
 
     <div class="divider"></div>
@@ -1064,6 +1108,33 @@
 
 <!-- Hidden import file input -->
 <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<!-- Wheel colour picker -->
+<div id="wheel-picker-overlay" onclick="closeWheelPicker(event)">
+  <div id="wheel-picker-sheet">
+    <div class="wheel-picker-title" id="wheel-picker-title">Choose a colour</div>
+    <div class="wheel-picker-controls">
+      <canvas id="hue-ring-canvas" width="200" height="200" style="cursor:crosshair;touch-action:none"></canvas>
+      <div class="wheel-slider-wrap">
+        <div class="wheel-slider-label">Sat</div>
+        <canvas id="sat-slider-canvas" width="34" height="180" style="cursor:pointer;touch-action:none;border-radius:8px"></canvas>
+      </div>
+      <div class="wheel-slider-wrap">
+        <div class="wheel-slider-label">Brt</div>
+        <canvas id="brt-slider-canvas" width="34" height="180" style="cursor:pointer;touch-action:none;border-radius:8px"></canvas>
+      </div>
+    </div>
+    <div class="wheel-preview-row">
+      <div id="wheel-preview-swatch"></div>
+      <div>
+        <div class="picker-label">Selected colour</div>
+        <div id="wheel-preview-hex" class="picker-sub">#000000</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="confirmWheelPicker()" style="margin-bottom:8px">✅ Use this colour</button>
+    <button class="btn btn-secondary" onclick="closeWheelPicker()">Cancel</button>
+  </div>
+</div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
@@ -1210,6 +1281,7 @@ function renderLibrary() {
   const mainBooks    = books.filter(b => !b.shelf);
   const honourBooks  = books.filter(b => b.shelf === 'honour');
   const naughtyBooks = books.filter(b => b.shelf === 'naughty');
+  const seasonalBooks = books.filter(b => b.shelf === 'seasonal');
 
   // Apply filters + sort to main list
   let list = [...mainBooks];
@@ -1246,6 +1318,7 @@ function renderLibrary() {
   // Render special shelves
   renderShelf('honour', honourBooks);
   renderShelf('naughty', naughtyBooks);
+  renderShelf('seasonal', seasonalBooks);
 }
 
 // Sort pills
@@ -1332,6 +1405,7 @@ function setShelf(type) {
   }
   document.getElementById('t-shelf-honour').classList.toggle('on', currentShelf === 'honour');
   document.getElementById('t-shelf-naughty').classList.toggle('on', currentShelf === 'naughty');
+  document.getElementById('t-shelf-seasonal').classList.toggle('on', currentShelf === 'seasonal');
 }
 
 // ── Share functions ───────────────────────────────────────────
@@ -1510,6 +1584,7 @@ function editBook(id) {
   currentShelf = b.shelf || null;
   document.getElementById('t-shelf-honour').classList.toggle('on', currentShelf === 'honour');
   document.getElementById('t-shelf-naughty').classList.toggle('on', currentShelf === 'naughty');
+  document.getElementById('t-shelf-seasonal').classList.toggle('on', currentShelf === 'seasonal');
   // Load photo if exists
   currentPhoto = b.photo || null;
   if (currentPhoto) { showPhotoPreview(currentPhoto); }
@@ -1531,6 +1606,7 @@ function resetForm() {
   currentShelf = null;
   document.getElementById('t-shelf-honour').classList.remove('on');
   document.getElementById('t-shelf-naughty').classList.remove('on');
+  document.getElementById('t-shelf-seasonal').classList.remove('on');
   currentPhoto = null;
   const preview = document.getElementById('photo-preview');
   preview.src = ''; preview.style.display = 'none';
@@ -1755,7 +1831,7 @@ function sanitiseBook(raw) {
     physical:   !!raw.physical,
     digital:    !!raw.digital,
     used:       !!raw.used,
-    shelf:      ['honour','naughty'].includes(raw.shelf) ? raw.shelf : null,
+    shelf:      ['honour','naughty','seasonal'].includes(raw.shelf) ? raw.shelf : null,
     photo:      safePhoto(raw.photo),
   };
 }
@@ -1825,7 +1901,7 @@ function renderCalendar() {
     const hasEvent = eventDates.has(dateStr);
     const isSelected = dateStr === calSelected;
     html += `<div class="cal-day${isToday?' today':''}${hasEvent?' has-event':''}${isSelected?' selected':''}"
-      onclick="selectCalDay('${dateStr}')">${d}</div>`;
+      data-date="${dateStr}" onclick="selectCalDay('${dateStr}')">${d}</div>`;
   }
 
   // Next month padding
@@ -1841,14 +1917,19 @@ function renderCalendar() {
 
 function selectCalDay(dateStr) {
   calSelected = dateStr;
-  renderCalendar();
+  // Update selected highlight on existing cells without rebuilding the grid
+  document.querySelectorAll('.cal-day').forEach(el => {
+    const elDate = el.getAttribute('data-date');
+    el.classList.toggle('selected', elDate === dateStr);
+  });
+  renderCalDayPanel();
+  renderUpcoming();
 }
 
 function renderCalDayPanel() {
   const el = document.getElementById('cal-day-panel');
   if (!calSelected) { el.innerHTML = ''; return; }
-  const [y,m,d] = calSelected.split('-');
-  const label = new Date(+y, +m-1, +d).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+  const label = new Date(calSelected + 'T00:00:00').toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
   const dayEvents = calEvents.filter(e => e.date === calSelected);
 
   el.innerHTML = `
@@ -1866,9 +1947,9 @@ function renderCalDayPanel() {
         : isSkipped
         ? `<span style="font-size:11px;font-weight:700;color:#C62828;background:#FFCDD2;padding:2px 8px;border-radius:10px;white-space:nowrap">❌ Skipped</span>`
         : '';
-      const hasReminder = ev.reminder?.enabled;
+      const hasReminder = e.reminder?.enabled;
       const reminderBadge = hasReminder
-        ? `<span style="font-size:11px;font-weight:700;color:#1565C0;background:#BBDEFB;padding:2px 8px;border-radius:10px;white-space:nowrap">🔔 ${ev.reminder.time}${ev.reminder.daysBefore > 0 ? ` · ${ev.reminder.daysBefore}d before` : ''}</span>`
+        ? `<span style="font-size:11px;font-weight:700;color:#1565C0;background:#BBDEFB;padding:2px 8px;border-radius:10px;white-space:nowrap">🔔 ${e.reminder.time}${e.reminder.daysBefore > 0 ? ` · ${e.reminder.daysBefore}d before` : ''}</span>`
         : '';
       return `<div class="cal-event-card" style="${cardStyle}">
         <div style="flex:1;min-width:0">
@@ -2072,9 +2153,10 @@ function scheduleNotifications() {
         body: ev.reminder.daysBefore > 0
           ? `Reminder: "${ev.name}" is ${ev.reminder.daysBefore === 1 ? 'tomorrow' : `in ${ev.reminder.daysBefore} days`}!`
           : `"${ev.name}" is today!`,
-        icon: './icon-192.png',
-        badge: './icon-192.png',
-        tag:  ev.id, // replaces previous notification for same event
+        icon:         './icon-192.png',
+        badge:        './notification-icon.png',
+        smallIcon:    './notification-icon.png',
+        tag:          ev.id,
       });
     }, delay);
   });
@@ -2246,37 +2328,225 @@ function selectPreset(id) {
   // Update swatch selection
   document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('selected'));
   document.getElementById('swatch-' + id).classList.add('selected');
-  // Sync pickers
-  document.getElementById('picker-primary').value = p.primary;
-  document.getElementById('picker-bg').value = p.bg;
+  // Sync colour buttons
   document.getElementById('primary-btn').style.background = p.primary;
   document.getElementById('bg-btn').style.background = p.bg;
   showToast('🎨 Theme applied!');
 }
 
-function onCustomChange() {
-  const primary = document.getElementById('picker-primary').value;
-  const bg      = document.getElementById('picker-bg').value;
+function openSettings() {
+  buildThemeGrid();
+  // Sync colour buttons to current theme
+  const saved = JSON.parse(localStorage.getItem(THEME_KEY) || '{}');
+  const primary = saved.primary || PRESETS[0].primary;
+  const bg      = saved.bg      || PRESETS[0].bg;
   document.getElementById('primary-btn').style.background = primary;
-  document.getElementById('bg-btn').style.background = bg;
-  // Deselect all presets
+  document.getElementById('bg-btn').style.background      = bg;
+  document.getElementById('settings-overlay').classList.add('open');
+}
+
+// ── Wheel colour picker ───────────────────────────────────────
+let pickerTarget = null;   // 'primary' or 'bg'
+let pickerH = 0, pickerS = 70, pickerV = 50;  // HSV 0-360, 0-100, 0-100
+
+function hexToHsv(hex) {
+  let r = parseInt(hex.slice(1,3),16)/255;
+  let g = parseInt(hex.slice(3,5),16)/255;
+  let b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+  let h = 0, s = max === 0 ? 0 : d/max, v = max;
+  if (d !== 0) {
+    if (max === r) h = ((g-b)/d + (g<b?6:0))/6;
+    else if (max === g) h = ((b-r)/d + 2)/6;
+    else h = ((r-g)/d + 4)/6;
+  }
+  return [h*360, s*100, v*100];
+}
+
+function hsvToHex(h, s, v) {
+  h /= 360; s /= 100; v /= 100;
+  let r,g,b;
+  const i = Math.floor(h*6), f = h*6-i;
+  const p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
+  switch(i%6) {
+    case 0: r=v;g=t;b=p; break; case 1: r=q;g=v;b=p; break;
+    case 2: r=p;g=v;b=t; break; case 3: r=p;g=q;b=v; break;
+    case 4: r=t;g=p;b=v; break; default: r=v;g=p;b=q;
+  }
+  return '#' + [r,g,b].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
+}
+
+function openWheelPicker(target) {
+  pickerTarget = target;
+  const saved = JSON.parse(localStorage.getItem(THEME_KEY) || '{}');
+  const hex = target === 'primary'
+    ? (saved.primary || PRESETS[0].primary)
+    : (saved.bg      || PRESETS[0].bg);
+  [pickerH, pickerS, pickerV] = hexToHsv(hex);
+  document.getElementById('wheel-picker-title').textContent =
+    target === 'primary' ? '🎨 Primary colour' : '🎨 Background colour';
+  document.getElementById('wheel-picker-overlay').classList.add('open');
+  // Draw after layout is visible
+  requestAnimationFrame(() => {
+    drawHueRing();
+    drawSatSlider();
+    drawBrtSlider();
+    updatePickerPreview();
+    attachPickerEvents();
+  });
+}
+
+function closeWheelPicker(e) {
+  if (!e || e.target === document.getElementById('wheel-picker-overlay')) {
+    document.getElementById('wheel-picker-overlay').classList.remove('open');
+  }
+}
+
+function confirmWheelPicker() {
+  const hex = hsvToHex(pickerH, pickerS, pickerV);
+  const saved = JSON.parse(localStorage.getItem(THEME_KEY) || '{}');
+  const primary = pickerTarget === 'primary' ? hex : (saved.primary || PRESETS[0].primary);
+  const bg      = pickerTarget === 'bg'      ? hex : (saved.bg      || PRESETS[0].bg);
+  document.getElementById('primary-btn').style.background = primary;
+  document.getElementById('bg-btn').style.background      = bg;
   document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('selected'));
   activePresetId = null;
   applyTheme(primary, bg);
   saveThemePrefs(primary, bg);
+  document.getElementById('wheel-picker-overlay').classList.remove('open');
+  showToast('🎨 Colour updated!');
 }
 
-function openSettings() {
-  buildThemeGrid();
-  // Sync pickers to current theme
-  const saved = JSON.parse(localStorage.getItem(THEME_KEY) || '{}');
-  const primary = saved.primary || PRESETS[0].primary;
-  const bg      = saved.bg      || PRESETS[0].bg;
-  document.getElementById('picker-primary').value = primary;
-  document.getElementById('picker-bg').value      = bg;
-  document.getElementById('primary-btn').style.background = primary;
-  document.getElementById('bg-btn').style.background      = bg;
-  document.getElementById('settings-overlay').classList.add('open');
+function updatePickerPreview() {
+  const hex = hsvToHex(pickerH, pickerS, pickerV);
+  document.getElementById('wheel-preview-swatch').style.background = hex;
+  document.getElementById('wheel-preview-hex').textContent = hex.toUpperCase();
+}
+
+function drawHueRing() {
+  const canvas = document.getElementById('hue-ring-canvas');
+  const ctx = canvas.getContext('2d');
+  const cx = 100, cy = 100, outerR = 90, innerR = 64;
+  ctx.clearRect(0,0,200,200);
+  // Draw hue ring as 360 segments
+  for (let i = 0; i < 360; i++) {
+    const startAngle = (i - 90) * Math.PI / 180;
+    const endAngle   = (i - 89) * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, outerR, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = `hsl(${i},100%,50%)`;
+    ctx.fill();
+  }
+  // Punch out inner circle
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR, 0, Math.PI*2);
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+  // Draw handle
+  const angle = (pickerH - 90) * Math.PI / 180;
+  const hr = (outerR + innerR) / 2;
+  const hx = cx + Math.cos(angle) * hr;
+  const hy = cy + Math.sin(angle) * hr;
+  ctx.beginPath();
+  ctx.arc(hx, hy, 10, 0, Math.PI*2);
+  ctx.fillStyle = `hsl(${pickerH},100%,50%)`;
+  ctx.fill();
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function drawSatSlider() {
+  const canvas = document.getElementById('sat-slider-canvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  // Gradient: top = full saturation, bottom = grey
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0, `hsl(${pickerH},100%,50%)`);
+  grad.addColorStop(1, `hsl(${pickerH},0%,50%)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+  // Handle: top = 100% sat, bottom = 0%
+  const hy = h - (pickerS / 100) * h;
+  ctx.beginPath();
+  ctx.arc(w/2, hy, 8, 0, Math.PI*2);
+  ctx.fillStyle = hsvToHex(pickerH, pickerS, 80);
+  ctx.fill();
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawBrtSlider() {
+  const canvas = document.getElementById('brt-slider-canvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  // Gradient: top = white/bright, bottom = black
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0, `hsl(${pickerH},${pickerS}%,95%)`);
+  grad.addColorStop(0.5, `hsl(${pickerH},${pickerS}%,50%)`);
+  grad.addColorStop(1, '#000000');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+  // Handle: top = 100% brt, bottom = 0%
+  const hy = h - (pickerV / 100) * h;
+  ctx.beginPath();
+  ctx.arc(w/2, hy, 8, 0, Math.PI*2);
+  ctx.fillStyle = hsvToHex(pickerH, pickerS, pickerV);
+  ctx.fill();
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function getCanvasPos(canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function handleRingInput(e) {
+  e.preventDefault();
+  const canvas = document.getElementById('hue-ring-canvas');
+  const {x, y} = getCanvasPos(canvas, e);
+  const cx = canvas.width/2, cy = canvas.height/2;
+  const angle = Math.atan2(y - cy, x - cx) * 180 / Math.PI + 90;
+  pickerH = ((angle % 360) + 360) % 360;
+  drawHueRing(); drawSatSlider(); drawBrtSlider(); updatePickerPreview();
+}
+
+function handleSatInput(e) {
+  e.preventDefault();
+  const canvas = document.getElementById('sat-slider-canvas');
+  const {y} = getCanvasPos(canvas, e);
+  pickerS = Math.max(0, Math.min(100, (1 - y / canvas.height) * 100));
+  drawSatSlider(); drawBrtSlider(); updatePickerPreview();
+}
+
+function handleBrtInput(e) {
+  e.preventDefault();
+  const canvas = document.getElementById('brt-slider-canvas');
+  const {y} = getCanvasPos(canvas, e);
+  pickerV = Math.max(0, Math.min(100, (1 - y / canvas.height) * 100));
+  drawBrtSlider(); updatePickerPreview();
+}
+
+let pickerEventsAttached = false;
+function attachPickerEvents() {
+  if (pickerEventsAttached) return;
+  pickerEventsAttached = true;
+  const ring = document.getElementById('hue-ring-canvas');
+  const sat  = document.getElementById('sat-slider-canvas');
+  const brt  = document.getElementById('brt-slider-canvas');
+  ['mousedown','touchstart'].forEach(ev => ring.addEventListener(ev, handleRingInput, {passive:false}));
+  ['mousemove','touchmove'].forEach(ev  => ring.addEventListener(ev, e => { if(e.buttons||e.touches) handleRingInput(e); }, {passive:false}));
+  ['mousedown','touchstart'].forEach(ev => sat.addEventListener(ev, handleSatInput, {passive:false}));
+  ['mousemove','touchmove'].forEach(ev  => sat.addEventListener(ev, e => { if(e.buttons||e.touches) handleSatInput(e); }, {passive:false}));
+  ['mousedown','touchstart'].forEach(ev => brt.addEventListener(ev, handleBrtInput, {passive:false}));
+  ['mousemove','touchmove'].forEach(ev  => brt.addEventListener(ev, e => { if(e.buttons||e.touches) handleBrtInput(e); }, {passive:false}));
 }
 
 function closeSettings(e) {
