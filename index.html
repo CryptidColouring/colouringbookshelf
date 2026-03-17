@@ -807,7 +807,7 @@
           <div class="pages-row">
             <div class="form-group">
               <label class="form-label" style="font-size:11px">Coloured so far</label>
-              <input class="form-input" id="f-pages" type="number" min="0" placeholder="0">
+              <input class="form-input" id="f-pages" type="number" min="0" placeholder="0" oninput="if(parseInt(this.value)>0){toggleState.used=true;updateToggles();}">
             </div>
             <div class="form-group">
               <label class="form-label" style="font-size:11px">Total in book</label>
