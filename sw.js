@@ -1,5 +1,5 @@
-const CACHE_NAME = 'colouring-bookshelf-v2';
-const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'colouring-bookshelf-v3';
+const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './notification-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
@@ -18,7 +18,6 @@ self.addEventListener('fetch', e => {
   const isHTML = e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
 
   if (isHTML) {
-    // Network-first for HTML: always try to get the latest, fall back to cache if offline
     e.respondWith(
       fetch(e.request)
         .then(res => {
@@ -29,9 +28,19 @@ self.addEventListener('fetch', e => {
         .catch(() => caches.match(e.request))
     );
   } else {
-    // Cache-first for everything else (icons, manifest etc)
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request))
     );
   }
+});
+
+// Open app when notification is tapped
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      if (list.length > 0) return list[0].focus();
+      return clients.openWindow('./');
+    })
+  );
 });
