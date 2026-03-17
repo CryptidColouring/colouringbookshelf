@@ -720,6 +720,7 @@
         <button class="sort-pill active" data-sort="title">Title</button>
         <button class="sort-pill" data-sort="author">Author</button>
         <button class="sort-pill" data-sort="pages">Pages</button>
+        <button class="sort-pill" data-sort="percent">% Done</button>
       </div>
       <div class="sort-bar" style="margin-top:-6px">
         <span class="sort-label">Filter:</span>
@@ -938,7 +939,7 @@
 
       <div class="help-section">
         <div class="help-section-title">📅 Calendar</div>
-        <p>Tap <strong>Calendar</strong> to plan your colouring projects. Tap any date to select it, then tap <strong>Add event on this day</strong> to create an event with a name and optional notes.</p>
+        <p>Tap <strong>Calendar</strong> to plan your colouring projects. Tap any date to select it, then tap <strong>Add event on this day</strong> to create an event with a name and optional notes, or edit an existing event to change details or due dates.</p>
         <p>You can mark events as <strong>✅ Completed</strong> or <strong>❌ Skipped</strong> by tapping the event's edit button. Completed events turn green, skipped events turn red — making it easy to scan what's still to do at a glance.</p>
         <p>To set a <strong>reminder notification</strong>, toggle <strong>🔔 Remind me</strong> when creating or editing an event, then choose a time and how far in advance you'd like to be notified. The app will need to be opened at least once within 48 hours of the event for the reminder to fire.</p>
         <p>Upcoming events appear in a list below the calendar. Events with reminders show a blue 🔔 badge.</p>
@@ -1303,9 +1304,14 @@ function renderLibrary() {
     if (!b.totalPages || b.totalPages === 0) return true;
     return (b.pages || 0) < b.totalPages;
   });
-  if (currentSort === 'title')  list.sort((a,b) => (a.title||'').localeCompare(b.title||''));
-  if (currentSort === 'author') list.sort((a,b) => (a.author||'').localeCompare(b.author||''));
-  if (currentSort === 'pages')  list.sort((a,b) => (b.pages||0) - (a.pages||0));
+  if (currentSort === 'title')   list.sort((a,b) => (a.title||'').localeCompare(b.title||''));
+  if (currentSort === 'author')  list.sort((a,b) => (a.author||'').localeCompare(b.author||''));
+  if (currentSort === 'pages')   list.sort((a,b) => (b.pages||0) - (a.pages||0));
+  if (currentSort === 'percent') list.sort((a,b) => {
+    const pctA = a.totalPages > 0 ? (a.pages||0) / a.totalPages : 0;
+    const pctB = b.totalPages > 0 ? (b.pages||0) / b.totalPages : 0;
+    return pctB - pctA;
+  });
 
   const countEl = document.getElementById('book-count');
   countEl.textContent = list.length === 0
