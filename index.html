@@ -75,8 +75,8 @@
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
     height: calc(var(--nav-h) + var(--safe-bottom));
-    background: var(--white);
-    border-top: 1.5px solid var(--parchment);
+    background: var(--terracotta);
+    border-top: 1.5px solid var(--primary-dark);
     display: flex; align-items: flex-start;
     padding-top: 6px;
     box-shadow: 0 -4px 16px var(--shadow);
@@ -86,12 +86,12 @@
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
     padding: 6px 4px;
     background: none; border: none; cursor: pointer;
-    color: var(--ink-soft); font-family: 'Nunito', sans-serif;
+    color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif;
     font-size: 11px; font-weight: 600;
     transition: color 0.15s;
   }
   .nav-btn .icon { font-size: 22px; line-height: 1; transition: transform 0.15s; }
-  .nav-btn.active { color: var(--terracotta); }
+  .nav-btn.active { color: white; }
   .nav-btn.active .icon { transform: scale(1.15); }
 
   /* ── Cards & common ── */
@@ -120,18 +120,32 @@
   .badge-unused   { background: var(--cream-dark); color: var(--ink-soft); }
 
   /* ── LIBRARY VIEW ── */
+  /* ── Library toolbar ── */
+  .lib-toolbar {
+    display: flex; gap: 8px; margin-bottom: 14px;
+  }
+  .lib-toolbar-btn {
+    flex: 1; padding: 9px 6px; border: none; border-radius: var(--radius-sm);
+    background: var(--cream-dark); color: var(--ink-mid);
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .lib-toolbar-btn:active { background: var(--parchment); }
+  .lib-toolbar-btn.has-active { background: var(--terracotta); color: white; }
+
+  /* Pills inside sheets */
   .sort-bar {
-    display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
   }
   .sort-label { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
   .sort-pill {
-    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
     background: var(--cream-dark); color: var(--ink-mid); border: none; cursor: pointer;
     transition: all 0.15s;
   }
   .sort-pill.active { background: var(--terracotta); color: white; }
   .filter-pill {
-    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
     background: var(--cream-dark); color: var(--ink-mid); border: 1.5px solid transparent;
     cursor: pointer; transition: all 0.15s;
   }
@@ -502,7 +516,10 @@
   }
   #wheel-preview-hex {
     font-size: 14px; font-weight: 600; color: var(--ink); font-family: monospace;
+    background: none; border: none; border-bottom: 1.5px solid var(--cream-dark);
+    width: 90px; padding: 2px 4px; outline: none; cursor: text;
   }
+  #wheel-preview-hex:focus { border-bottom-color: var(--terracotta); }
 
   .settings-section-title {
     font-family: 'Playfair Display', serif;
@@ -533,17 +550,6 @@
   .shelf-body.open { display: block; }
 
   /* ── Share / Compare ── */
-  .share-row {
-    display: flex; gap: 8px; margin-bottom: 14px;
-  }
-  .share-btn {
-    flex: 1; padding: 8px 6px; border: none; border-radius: var(--radius-sm);
-    background: var(--cream-dark); color: var(--ink-mid);
-    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
-    cursor: pointer; transition: all 0.15s; text-align: center;
-  }
-  .share-btn:active { background: var(--parchment); }
-
   /* ── Compare results ── */
   .compare-section { margin-top: 16px; }
   .compare-badge {
@@ -710,25 +716,10 @@
 
     <!-- ── LIBRARY VIEW ── -->
     <div class="view active" id="view-library">
-      <div class="share-row">
-        <button class="share-btn" onclick="shareAsText()">📤 Share List</button>
-        <button class="share-btn" onclick="shareAsFile()">📦 Share File</button>
-        <button class="share-btn" onclick="openCompare()">🔀 Compare Lists</button>
-      </div>
-      <div class="sort-bar">
-        <span class="sort-label">Sort:</span>
-        <button class="sort-pill active" data-sort="title">Title</button>
-        <button class="sort-pill" data-sort="author">Author</button>
-        <button class="sort-pill" data-sort="pages">Pages</button>
-        <button class="sort-pill" data-sort="percent">% Done</button>
-      </div>
-      <div class="sort-bar" style="margin-top:-6px">
-        <span class="sort-label">Filter:</span>
-        <button class="filter-pill" data-filter="physical">📚 Physical</button>
-        <button class="filter-pill" data-filter="digital">💻 Digital</button>
-        <button class="filter-pill" data-filter="used">✅ Used</button>
-        <button class="filter-pill" data-filter="unused">⏳ Unused</button>
-        <button class="filter-pill" data-filter="hidecomplete">🙈 Hide Complete</button>
+      <div class="lib-toolbar">
+        <button class="lib-toolbar-btn" id="btn-share-sheet" onclick="openLibSheet('share')">📤 Share / Import</button>
+        <button class="lib-toolbar-btn" id="btn-sort-sheet" onclick="openLibSheet('sort')">↕️ Sort</button>
+        <button class="lib-toolbar-btn" id="btn-filter-sheet" onclick="openLibSheet('filter')">🔽 Filter</button>
       </div>
       <div class="book-count" id="book-count"></div>
       <div id="book-list"></div>
@@ -939,7 +930,7 @@
 
       <div class="help-section">
         <div class="help-section-title">📅 Calendar</div>
-        <p>Tap <strong>Calendar</strong> to plan your colouring projects. Tap any date to select it, then tap <strong>Add event on this day</strong> to create an event with a name and optional notes, or edit an existing event to change details or due dates.</p>
+        <p>Tap <strong>Calendar</strong> to plan your colouring projects. Tap any date to select it, then tap <strong>Add event on this day</strong> to create an event with a name and optional notes.</p>
         <p>You can mark events as <strong>✅ Completed</strong> or <strong>❌ Skipped</strong> by tapping the event's edit button. Completed events turn green, skipped events turn red — making it easy to scan what's still to do at a glance.</p>
         <p>To set a <strong>reminder notification</strong>, toggle <strong>🔔 Remind me</strong> when creating or editing an event, then choose a time and how far in advance you'd like to be notified. The app will need to be opened at least once within 48 hours of the event for the reminder to fire.</p>
         <p>Upcoming events appear in a list below the calendar. Events with reminders show a blue 🔔 badge.</p>
@@ -1077,6 +1068,16 @@
       <input class="form-input" id="cal-f-notes" placeholder="e.g. Pages 12-14, green palette" autocomplete="off">
     </div>
     <div class="form-group">
+      <label class="form-label">Image <span style="font-weight:400;color:var(--ink-soft)">(optional — moodboard, pages, etc.)</span></label>
+      <div class="photo-upload-area" id="cal-photo-upload-area" style="height:120px" onclick="triggerCalPhotoInput()">
+        <img id="cal-photo-preview" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm)">
+        <span class="photo-upload-icon" id="cal-photo-icon">🖼</span>
+        <span class="photo-upload-label" id="cal-photo-hint">Tap to add image</span>
+        <button class="photo-remove" id="cal-photo-remove" onclick="removeCalPhoto(event)">✕</button>
+        <input type="file" id="cal-f-photo" accept="image/*" style="display:none" onchange="handleCalPhoto(event)">
+      </div>
+    </div>
+    <div class="form-group">
       <label class="form-label">Status</label>
       <div class="toggle-group">
         <div class="toggle-row" onclick="setCalStatus('done')">
@@ -1117,6 +1118,17 @@
   </div>
 </div>
 
+<!-- Book title search sheet -->
+<!-- Calendar image viewer -->
+<div id="cal-img-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:400;align-items:center;justify-content:center" onclick="document.getElementById('cal-img-modal').style.display='none'">
+  <img id="cal-img-modal-img" style="max-width:92vw;max-height:85vh;border-radius:12px;object-fit:contain" alt="event image">
+</div>
+
+<!-- Library sheets -->
+<div class="overlay" id="lib-sheet-overlay" onclick="closeLibSheet(event)">
+  <div class="sheet" id="lib-sheet-content"></div>
+</div>
+
 <!-- Hidden import file input -->
 <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImport(event)">
 
@@ -1139,7 +1151,7 @@
       <div id="wheel-preview-swatch"></div>
       <div>
         <div class="picker-label">Selected colour</div>
-        <div id="wheel-preview-hex" class="picker-sub">#000000</div>
+        <input class="picker-sub" id="wheel-preview-hex" maxlength="7" spellcheck="false" oninput="onHexInput(this.value)">
       </div>
     </div>
     <button class="btn btn-primary" onclick="confirmWheelPicker()" style="margin-bottom:8px">✅ Use this colour</button>
@@ -1158,33 +1170,83 @@ let currentSort = 'title';
 let activeFilters = new Set();
 let toggleState = { physical: false, digital: false, used: false };
 let currentPhoto = null; // base64 string or null
+let currentCalPhoto = null; // base64 string or null for calendar events
 
 // ── Photo handling ────────────────────────────────────────────
 function triggerPhotoInput() {
   document.getElementById('f-photo').click();
 }
 
-function handlePhoto(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+function triggerCalPhotoInput() {
+  document.getElementById('cal-f-photo').click();
+}
+
+function compressPhoto(file, size, cb) {
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
     img.onload = () => {
-      // Compress to 300x300 canvas
       const canvas = document.createElement('canvas');
-      canvas.width = 300; canvas.height = 300;
+      canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext('2d');
-      // Cover crop
-      const ratio = Math.max(300 / img.width, 300 / img.height);
+      const ratio = Math.max(size / img.width, size / img.height);
       const w = img.width * ratio, h = img.height * ratio;
-      ctx.drawImage(img, (300 - w) / 2, (300 - h) / 2, w, h);
-      currentPhoto = canvas.toDataURL('image/jpeg', 0.7);
-      showPhotoPreview(currentPhoto);
+      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.7));
     };
     img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+function handlePhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  compressPhoto(file, 300, data => {
+    currentPhoto = data;
+    showPhotoPreview(data);
+  });
+}
+
+function handleCalPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  compressPhoto(file, 400, data => {
+    currentCalPhoto = data;
+    showCalPhotoPreview(data);
+  });
+}
+
+function showCalPhotoPreview(src) {
+  const preview = document.getElementById('cal-photo-preview');
+  preview.src = src; preview.style.display = 'block';
+  document.getElementById('cal-photo-icon').style.display = 'none';
+  document.getElementById('cal-photo-hint').style.display = 'none';
+  document.getElementById('cal-photo-remove').classList.add('visible');
+}
+
+function resetCalPhotoUI() {
+  const preview = document.getElementById('cal-photo-preview');
+  if (preview) { preview.src = ''; preview.style.display = 'none'; }
+  const icon = document.getElementById('cal-photo-icon');
+  const hint = document.getElementById('cal-photo-hint');
+  const rem  = document.getElementById('cal-photo-remove');
+  if (icon) icon.style.display = '';
+  if (hint) hint.style.display = '';
+  if (rem)  rem.classList.remove('visible');
+  const inp = document.getElementById('cal-f-photo');
+  if (inp) inp.value = '';
+}
+
+function removeCalPhoto(e) {
+  e.stopPropagation();
+  currentCalPhoto = null;
+  const preview = document.getElementById('cal-photo-preview');
+  preview.src = ''; preview.style.display = 'none';
+  document.getElementById('cal-photo-icon').style.display = '';
+  document.getElementById('cal-photo-hint').style.display = '';
+  document.getElementById('cal-photo-remove').classList.remove('visible');
+  document.getElementById('cal-f-photo').value = '';
 }
 
 function showPhotoPreview(src) {
@@ -1268,7 +1330,9 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
+  const view = document.getElementById('view-' + name);
+  view.classList.add('active');
+  view.scrollTop = 0;
   const nb = document.querySelector(`.nav-btn[data-view="${name}"]`);
   if (nb) nb.classList.add('active');
   if (name === 'library')  renderLibrary();
@@ -1287,14 +1351,17 @@ function updateHeader() {
 }
 
 // ── Library ───────────────────────────────────────────────────
+let vList        = [];      // current filtered+sorted main list
+let vCardHeight  = 120;     // estimated card height in px, measured after first render
+let vScrollTimer = null;    // debounce handle
+
 function renderLibrary() {
-  // Separate into shelves
-  const mainBooks    = books.filter(b => !b.shelf);
-  const honourBooks  = books.filter(b => b.shelf === 'honour');
-  const naughtyBooks = books.filter(b => b.shelf === 'naughty');
+  const mainBooks     = books.filter(b => !b.shelf);
+  const honourBooks   = books.filter(b => b.shelf === 'honour');
+  const naughtyBooks  = books.filter(b => b.shelf === 'naughty');
   const seasonalBooks = books.filter(b => b.shelf === 'seasonal');
 
-  // Apply filters + sort to main list
+  // Apply filters + sort
   let list = [...mainBooks];
   if (activeFilters.has('physical'))     list = list.filter(b => b.physical);
   if (activeFilters.has('digital'))      list = list.filter(b => b.digital);
@@ -1313,6 +1380,8 @@ function renderLibrary() {
     return pctB - pctA;
   });
 
+  vList = list;
+
   const countEl = document.getElementById('book-count');
   countEl.textContent = list.length === 0
     ? 'No books match your filters'
@@ -1328,38 +1397,155 @@ function renderLibrary() {
   } else if (list.length === 0) {
     el.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>No matches</h3><p>Try removing some filters.</p></div>`;
   } else {
-    el.innerHTML = list.map(b => bookCardHTML(b)).join('');
+    renderVirtualWindow();
+    // Measure real card height after first paint
+    requestAnimationFrame(() => {
+      const firstCard = el.querySelector('.book-card');
+      if (firstCard) {
+        const h = firstCard.getBoundingClientRect().height;
+        if (h > 0) vCardHeight = h + 12; // include gap
+      }
+    });
   }
 
-  // Render special shelves
   renderShelf('honour', honourBooks);
   renderShelf('naughty', naughtyBooks);
   renderShelf('seasonal', seasonalBooks);
 }
 
-// Sort pills
-document.querySelectorAll('.sort-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.sort-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentSort = btn.dataset.sort;
-    renderLibrary();
-  });
-});
+function renderVirtualWindow() {
+  const el       = document.getElementById('book-list');
+  const view     = document.getElementById('view-library');
+  const scrollTop = view.scrollTop;
+  const viewH    = view.clientHeight;
+  const BUFFER   = 5; // cards above and below viewport to pre-render
 
-// Filter pills
-document.querySelectorAll('.filter-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const f = btn.dataset.filter;
-    // Exclusive pairs
-    if (f === 'used' && activeFilters.has('unused')) activeFilters.delete('unused');
-    if (f === 'unused' && activeFilters.has('used')) activeFilters.delete('used');
-    if (activeFilters.has(f)) activeFilters.delete(f);
-    else activeFilters.add(f);
-    document.querySelectorAll('.filter-pill').forEach(b => b.classList.toggle('active', activeFilters.has(b.dataset.filter)));
-    renderLibrary();
-  });
-});
+  const total    = vList.length;
+  const startIdx = Math.max(0, Math.floor(scrollTop / vCardHeight) - BUFFER);
+  const endIdx   = Math.min(total, Math.ceil((scrollTop + viewH) / vCardHeight) + BUFFER);
+
+  const topPad   = startIdx * vCardHeight;
+  const botPad   = Math.max(0, (total - endIdx) * vCardHeight);
+
+  const fragment = document.createDocumentFragment();
+
+  // Top spacer
+  const top = document.createElement('div');
+  top.style.height = topPad + 'px';
+  fragment.appendChild(top);
+
+  // Visible cards
+  for (let i = startIdx; i < endIdx; i++) {
+    const div = document.createElement('div');
+    div.innerHTML = bookCardHTML(vList[i]);
+    fragment.appendChild(div.firstChild);
+  }
+
+  // Bottom spacer
+  const bot = document.createElement('div');
+  bot.style.height = botPad + 'px';
+  fragment.appendChild(bot);
+
+  el.innerHTML = '';
+  el.appendChild(fragment);
+}
+
+function onLibraryScroll() {
+  if (vList.length === 0) return;
+  clearTimeout(vScrollTimer);
+  vScrollTimer = setTimeout(renderVirtualWindow, 30);
+}
+
+// ── Library sheets ────────────────────────────────────────────
+function openLibSheet(type) {
+  const sheet = document.getElementById('lib-sheet-content');
+  if (type === 'share') {
+    sheet.innerHTML = `
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">📤 Share / Import</div>
+      <button class="btn btn-primary" onclick="shareAsText();closeLibSheet()" style="margin-bottom:10px">📤 Share List</button>
+      <button class="btn btn-primary" onclick="shareAsFile();closeLibSheet()" style="margin-bottom:10px">📦 Share File</button>
+      <button class="btn btn-secondary" onclick="openCompare();closeLibSheet()">🔀 Compare Lists</button>`;
+  } else if (type === 'sort') {
+    const sorts = [
+      { key: 'title',   label: 'Title' },
+      { key: 'author',  label: 'Author' },
+      { key: 'pages',   label: 'Pages done' },
+      { key: 'percent', label: '% Complete' },
+    ];
+    sheet.innerHTML = `
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">↕️ Sort Library</div>
+      <div class="sort-bar" style="flex-direction:column;align-items:stretch">
+        ${sorts.map(s => `
+          <button class="sort-pill${currentSort === s.key ? ' active' : ''}"
+            style="text-align:left;border-radius:var(--radius-sm);padding:12px 16px"
+            onclick="setSort('${s.key}')">
+            ${currentSort === s.key ? '✓ ' : ''}${s.label}
+          </button>`).join('')}
+      </div>`;
+  } else if (type === 'filter') {
+    const filters = [
+      { key: 'physical',    label: '📚 Physical only' },
+      { key: 'digital',     label: '💻 Digital only' },
+      { key: 'used',        label: '✅ Used only' },
+      { key: 'unused',      label: '⏳ Unused only' },
+      { key: 'hidecomplete',label: '🙈 Hide complete' },
+    ];
+    sheet.innerHTML = `
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">🔽 Filter Library</div>
+      <div class="sort-bar" style="flex-direction:column;align-items:stretch">
+        ${filters.map(f => `
+          <button class="filter-pill${activeFilters.has(f.key) ? ' active' : ''}"
+            style="text-align:left;border-radius:var(--radius-sm);padding:12px 16px"
+            onclick="toggleFilter('${f.key}')">
+            ${activeFilters.has(f.key) ? '✓ ' : ''}${f.label}
+          </button>`).join('')}
+      </div>
+      ${activeFilters.size > 0 ? `<button class="btn btn-secondary" style="margin-top:12px" onclick="clearFilters()">✖ Clear all filters</button>` : ''}`;
+  }
+  document.getElementById('lib-sheet-overlay').classList.add('open');
+  updateToolbarState();
+}
+
+function closeLibSheet(e) {
+  if (!e || e.target === document.getElementById('lib-sheet-overlay')) {
+    document.getElementById('lib-sheet-overlay').classList.remove('open');
+  }
+}
+
+function setSort(key) {
+  currentSort = key;
+  renderLibrary();
+  closeLibSheet();
+  updateToolbarState();
+}
+
+function toggleFilter(f) {
+  if (f === 'used'   && activeFilters.has('unused')) activeFilters.delete('unused');
+  if (f === 'unused' && activeFilters.has('used'))   activeFilters.delete('used');
+  if (activeFilters.has(f)) activeFilters.delete(f);
+  else activeFilters.add(f);
+  renderLibrary();
+  // Re-render the filter sheet in place so checkmarks update
+  openLibSheet('filter');
+  updateToolbarState();
+}
+
+function clearFilters() {
+  activeFilters.clear();
+  renderLibrary();
+  closeLibSheet();
+  updateToolbarState();
+}
+
+function updateToolbarState() {
+  const sortBtn   = document.getElementById('btn-sort-sheet');
+  const filterBtn = document.getElementById('btn-filter-sheet');
+  if (sortBtn)   sortBtn.classList.toggle('has-active', currentSort !== 'title');
+  if (filterBtn) filterBtn.classList.toggle('has-active', activeFilters.size > 0);
+}
 
 // ── Book card HTML helper ─────────────────────────────────────
 function bookCardHTML(b) {
@@ -1542,20 +1728,22 @@ function openBook(id) {
     ${pages}${tags}${completionHtml}
     <div style="display:flex;gap:10px;margin-top:20px">
       <button class="btn btn-primary" style="flex:1" onclick="editBook('${b.id}')">✏️ Edit</button>
-      <button class="btn btn-secondary" style="flex:1" onclick="quickToggleUsed('${b.id}')">
-        ${b.used ? '↩️ Mark unused' : '✅ Mark used'}
+      <button class="btn btn-secondary" style="flex:1" onclick="quickAddPage('${b.id}')">
+        ➕ Add completed page
       </button>
     </div>`;
   document.getElementById('overlay').classList.add('open');
 }
 
-async function quickToggleUsed(id) {
+async function quickAddPage(id) {
   const b = books.find(x => x.id === id);
   if (!b) return;
-  b.used = !b.used;
+  b.pages = (b.pages || 0) + 1;
+  if (!b.used) b.used = true;
   await dbPut(b);
   closeOverlay(); renderLibrary(); updateHeader();
-  showToast(b.used ? '✅ Marked as used!' : '↩️ Marked as unused');
+  const total = b.totalPages > 0 ? ` (${Math.round(b.pages / b.totalPages * 100)}%)` : '';
+  showToast(`📖 Page added! ${b.pages} page${b.pages !== 1 ? 's' : ''} done${total}`);
 }
 
 function quickAddPhoto(id) {
@@ -1967,7 +2155,11 @@ function renderCalDayPanel() {
       const reminderBadge = hasReminder
         ? `<span style="font-size:11px;font-weight:700;color:#1565C0;background:#BBDEFB;padding:2px 8px;border-radius:10px;white-space:nowrap">🔔 ${e.reminder.time}${e.reminder.daysBefore > 0 ? ` · ${e.reminder.daysBefore}d before` : ''}</span>`
         : '';
+      const thumbHtml = (e.photo && safePhoto(e.photo))
+        ? `<img src="${e.photo}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;cursor:pointer" onclick="openCalImageModal('${e.id}')" alt="event image">`
+        : '';
       return `<div class="cal-event-card" style="${cardStyle}">
+        ${thumbHtml}
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div class="cal-event-name">${esc(e.name)}</div>
@@ -2036,6 +2228,8 @@ function openCalAdd() {
   document.getElementById('cal-f-notes').value = '';
   setCalStatusUI(null);
   setReminderUI(false, '09:00', 0);
+  currentCalPhoto = null;
+  resetCalPhotoUI();
   document.getElementById('cal-overlay').classList.add('open');
 }
 
@@ -2050,7 +2244,18 @@ function openCalEdit(id) {
   setCalStatusUI(ev.status || null);
   const r = ev.reminder || {};
   setReminderUI(!!r.enabled, r.time || '09:00', r.daysBefore || 0);
+  currentCalPhoto = ev.photo || null;
+  if (currentCalPhoto) showCalPhotoPreview(currentCalPhoto);
+  else resetCalPhotoUI();
   document.getElementById('cal-overlay').classList.add('open');
+}
+
+function openCalImageModal(id) {
+  const ev = calEvents.find(e => e.id === id);
+  if (!ev?.photo) return;
+  const modal = document.getElementById('cal-img-modal');
+  document.getElementById('cal-img-modal-img').src = ev.photo;
+  modal.style.display = 'flex';
 }
 
 function setCalStatus(type) {
@@ -2122,6 +2327,7 @@ async function saveCalEvent() {
     name,
     notes:    document.getElementById('cal-f-notes').value.trim(),
     status:   getCalStatus(),
+    photo:    currentCalPhoto || null,
     reminder: reminder,
   };
   await dbPutCal(ev);
@@ -2194,10 +2400,10 @@ const THEME_KEY = 'colour_bookshelf_theme';
 const PRESETS = [
   { id: 'forest',   label: '🌿 Forest',   primary: '#4D9166', bg: '#D0EBCD' },
   { id: 'autumn',   label: '🍂 Autumn',   primary: '#B5714A', bg: '#F5EFE4' },
-  { id: 'ocean',    label: '🌊 Ocean',    primary: '#2E7FAA', bg: '#CCE8F5' },
+  { id: 'ocean',    label: '🌊 Ocean',    primary: '#4A9DB8', bg: '#E0F2F8' },
   { id: 'blossom',  label: '🌸 Blossom',  primary: '#B85C7E', bg: '#F5D8E6' },
   { id: 'lilac',    label: '💜 Lilac',    primary: '#7762B5', bg: '#EAE4F7' },
-  { id: 'slate',    label: '🌙 Slate',    primary: '#4A6FA8', bg: '#DDE5F2' },
+  { id: 'slate',    label: '🌙 Slate',    primary: '#3A3D42', bg: '#EAEAEC' },
 ];
 
 // Hex ↔ RGB ↔ HSL helpers
@@ -2440,7 +2646,25 @@ function confirmWheelPicker() {
 function updatePickerPreview() {
   const hex = hsvToHex(pickerH, pickerS, pickerV);
   document.getElementById('wheel-preview-swatch').style.background = hex;
-  document.getElementById('wheel-preview-hex').textContent = hex.toUpperCase();
+  const hexInput = document.getElementById('wheel-preview-hex');
+  // Only update if not currently focused (don't interrupt typing)
+  if (document.activeElement !== hexInput) {
+    hexInput.value = hex.toUpperCase();
+  }
+}
+
+function onHexInput(val) {
+  // Auto-prepend # if missing
+  if (val && !val.startsWith('#')) val = '#' + val;
+  const hexInput = document.getElementById('wheel-preview-hex');
+  hexInput.value = val;
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    [pickerH, pickerS, pickerV] = hexToHsv(val);
+    document.getElementById('wheel-preview-swatch').style.background = val;
+    drawHueRing();
+    drawSatSlider();
+    drawBrtSlider();
+  }
 }
 
 function drawHueRing() {
@@ -2581,6 +2805,7 @@ function exportData() {
     version: 1,
     exportDate: new Date().toISOString(),
     books: books,
+    calEvents: calEvents,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -2631,6 +2856,26 @@ async function handleImport(e) {
         added++;
       }
     }
+
+    // Restore cal events if present
+    if (Array.isArray(payload.calEvents)) {
+      const existingCalIds = new Set(calEvents.map(e => e.id));
+      for (const raw of payload.calEvents) {
+        if (!raw.id || existingCalIds.has(raw.id)) continue;
+        const ev = {
+          id:       safeStr(raw.id, 64).replace(/[^a-zA-Z0-9_-]/g,'') || uid(),
+          date:     safeStr(raw.date, 10),
+          name:     safeStr(raw.name),
+          notes:    safeStr(raw.notes),
+          status:   ['done','skipped'].includes(raw.status) ? raw.status : null,
+          photo:    safePhoto(raw.photo) || null,
+          reminder: raw.reminder || null,
+        };
+        calEvents.push(ev);
+        await dbPutCal(ev);
+      }
+    }
+
     renderLibrary(); updateHeader();
     showToast(`✅ Imported ${added} book${added !== 1 ? 's' : ''}!`);
   } catch (err) {
@@ -2663,6 +2908,9 @@ async function handleImport(e) {
   renderLibrary();
   updateHeader();
   scheduleNotifications();
+
+  // Attach virtualisation scroll listener
+  document.getElementById('view-library').addEventListener('scroll', onLibraryScroll, { passive: true });
 
   // Request persistent storage so browser won't auto-evict data
   if (navigator.storage && navigator.storage.persist) {
