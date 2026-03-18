@@ -2495,6 +2495,10 @@ function applyTheme(primary, bg) {
   // Badge colours derived from theme
   const badgeUsedBg   = rgbToHex(...hslToRgb(...rgbToHsl(...hexToRgb(t.primary)).map((v,i)=>i===2?Math.min(v+36,94):v)));
   updateBadgeStyles(badgeUsedBg, t.pDark, t.bgDark, t.inkSoft);
+
+  // Update system UI colour (navigation bar / status bar on Android)
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.setAttribute('content', t.primary);
 }
 
 function hexToRgba(hex, alpha) {
