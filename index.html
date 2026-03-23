@@ -2537,7 +2537,7 @@ async function saveCalEvent() {
     let cursor = new Date(date + 'T00:00:00');
     cursor.setDate(cursor.getDate() + repeatDays);
     while (cursor <= cutoff) {
-      const occDate = cursor.toISOString().slice(0, 10);
+      const occDate = `${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`;
       const occ = {
         id:         uid(),
         date:       occDate,
